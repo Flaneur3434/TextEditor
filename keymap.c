@@ -1,5 +1,6 @@
 #include "marisa.h"
 
+extern editorConfig E;
 void
 readSpaceMap (void)
 {
@@ -14,7 +15,7 @@ readSpaceMap (void)
     switch (seq[0])
 		{
 		case ' ':
-			switchModes();
+			SWITCH_MODE;
 			break;
 		case ';':
 			editorSave();

@@ -5,10 +5,13 @@ extern editorConfig E;
 void
 editorRefreshScreen (void)
 {
-	editorScroll();
+	if (is_term_resized(LINES, COLS) == TRUE)
+		/* TODO: Resize handling */
+		return;
 
+	editorScroll();
 	editorDrawRows();
-	editorDrawStatusBar();
+	/* editorDrawStatusBar(); */
 	/* editorDrawMessageBar(&ab) */;
 
 	/* wprintw(FRAME->frame, "%s", ab.b); */
@@ -210,6 +213,7 @@ WINDOW *createNewWin (int height, int width, int starty, int startx, unsigned in
 {	WINDOW *localWin;
 
 	localWin = newwin(height, width, starty, startx);
+	keypad(localWin, TRUE);
 	box(localWin, 0 , 0);
 	wbkgd(localWin, COLOR_PAIR(colorPairNum));
 	wrefresh(localWin);

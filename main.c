@@ -15,7 +15,6 @@ main (int argc, char *argv[])
 	}
 
 	int x = 0;
-	int y = 0;
 
 	while(x < 20)
 	{
@@ -24,9 +23,11 @@ main (int argc, char *argv[])
 		else if (BUFFER->flags.mode == VISUAL_MODE)
 			editorProcessKeypressVisual();
 
-		switchFrame();
-		mvwprintw(FRAME->frame, ++y, ++x, "Buffer name is: %s", BUFFER->buffername);
+		if (BUFFER->flags.mode != NORMAL_MODE)
+			mvwprintw(FRAME->frame, x++, 0, "Changed mode");
+
 		editorRefreshScreen();
+		switchFrame();
 	}
 
 	killFrame();

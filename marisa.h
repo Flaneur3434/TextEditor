@@ -29,12 +29,15 @@
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define NORMAL_MODE 0
 #define VISUAL_MODE 1
+#define TEXTWINDOW_COLOR 1
+#define STATUSBAR_COLOR 2
 #define MAP_KEY_CHORD_MAX 2
 #define MAP_KEY_LAYER_ONE 0
 #define MAP_KEY_LAYER_TWO 1
 #define CLEAN 0
 #define DIRTY 1
 #define BLURT fprintf(stderr, "%s:%d\tfunction %s %s\n", __FILE__, __LINE__, __func__, E->filename);
+#define SWITCH_MODE (E.currentFrame->currentBuffer->flags.mode = E.currentFrame->currentBuffer->flags.mode == NORMAL_MODE ? VISUAL_MODE : NORMAL_MODE)
 
 enum editorKey {
 	BACKSPACE = 127,
@@ -97,7 +100,7 @@ void switchModes (void);
 
 void setupTerm (void);
 void die (const char *);
-int readEscKey (void);
+int readKeyChord (void);
 void readSpaceMap (void);
 int editorReadKeyNormal (void);
 int editorReadKeyVisual (void);

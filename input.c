@@ -19,19 +19,19 @@ editorPrompt (char *prompt)
 		editorSetStatusMessage(prompt, userInput);
 		editorRefreshScreen();
 		BUFFER->flags.mode = NORMAL_MODE;
-		int c = editorReadKeyNormal();
-		if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE)
+		int c = wgetch(FRAME->frame);
+		if (c == KEY_DC || c == KEY_BACKSPACE)
 		{
 			if (userInputLen != 0) userInput[--userInputLen] = '\0';
 		}
 		/* cancle on Esc */
-		else if (c == '\x1b' || (c == '\r' && userInputLen == 0))
+		else if (c == '\x1b' || (c == KEY_ENTER && userInputLen == 0))
 		{
 			editorSetStatusMessage("");
 			free(userInput);
 			return NULL;
 		}
-		else if (c == '\r')
+		else if (c == KEY_ENTER)
 		{
 			if (userInputLen != 0)
 			{
@@ -58,11 +58,11 @@ void
 editorProcessKeypressNormal (void)
 {
 	int times;
-	int c = editorReadKeyNormal ();
+	int c = wgetch(FRAME->frame);
 
 	switch (c)
 	{
-	case '\r':
+	case KEY_ENTER:
 		editorInsertNewline();
 		break;
 	case CTRL_KEY('q'):
@@ -72,25 +72,23 @@ editorProcessKeypressNormal (void)
 	case CTRL_KEY('s'):
 		editorSave();
 		break;
-	case HOME_KEY:
-		switchModes();
+	case KEY_HOME:
+		SWITCH_MODE;
 		break;
-	case BACKSPACE:
-	case CTRL_KEY('h'):
-	case DEL_KEY:
-		if (c == DEL_KEY)
-			editorMoveCursor(ARROW_RIGHT);
-
+	case KEY_DC:
+		editorMoveCursor(KEY_RIGHT);
+		__attribute__ ((fallthrough));
+	case KEY_BACKSPACE:
 		editorDelChar();
 		break;
-	case PAGE_UP:
-	case PAGE_DOWN:
+	case KEY_NPAGE:
+	case KEY_PPAGE:
 		{
-			if (c == PAGE_UP)
+			if (c == KEY_PPAGE)
 			{
 				FRAME->cy = FRAME->rowoff;
 			}
-			else if (c == PAGE_DOWN)
+			else if (c == KEY_NPAGE)
 			{
 				FRAME->cy = FRAME->rowoff + FRAME->screenrows - 1;
 				if (FRAME->cy > BUFFER->numrows)
@@ -99,14 +97,14 @@ editorProcessKeypressNormal (void)
 
 			times = FRAME->screenrows;
 			while (times--)
-				editorMoveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+				editorMoveCursor(c == KEY_PPAGE ? ARROW_UP : ARROW_DOWN);
 		}
 		break;
 
-	case ARROW_UP:
-	case ARROW_DOWN:
-	case ARROW_LEFT:
-	case ARROW_RIGHT:
+	case KEY_UP:
+	case KEY_DOWN:
+	case KEY_LEFT:
+	case KEY_RIGHT:
 		editorMoveCursor(c);
 		break;
 	case CTRL_KEY('l'):
@@ -121,29 +119,27 @@ editorProcessKeypressNormal (void)
 void
 editorProcessKeypressVisual (void)
 {
-	int c = editorReadKeyVisual();
+	int c = wgetch(FRAME->frame);
 
 	switch (c)
 	{
-	case '\r':
+	case KEY_ENTER:
 		break;
 	case CTRL_KEY('f'):
 		break;
 	case CTRL_KEY('q'):
-		write(STDOUT_FILENO, "\x1b[2J", 4);
-		write(STDOUT_FILENO, "\x1b[H", 3);
-		exit(0);
+		die("Didnt't save? HAHAHAHA");
 		break;
 	case CTRL_KEY('s'):
 		editorSave();
 		break;
-	case HOME_KEY:
-		switchModes();
+	case KEY_HOME:
+		SWITCH_MODE;
 		break;
-	case ARROW_UP:
-	case ARROW_DOWN:
-	case ARROW_LEFT:
-	case ARROW_RIGHT:
+	case KEY_UP:
+	case KEY_DOWN:
+	case KEY_LEFT:
+	case KEY_RIGHT:
 		editorMoveCursor(c);
 		break;
 	case 'h':
@@ -167,7 +163,7 @@ editorMoveCursor (int key)
 
 	switch (key)
 	{
-	case ARROW_LEFT:
+	case KEY_LEFT:
 		if (FRAME->cx != 0)
 		{
 			FRAME->cx--;
@@ -178,7 +174,7 @@ editorMoveCursor (int key)
 			FRAME->cx = BUFFER->row[FRAME->cy].size;
 		}
 		break;
-	case ARROW_RIGHT:
+	case KEY_RIGHT:
 		if (row && FRAME->cx < row->size)
 		{
 			FRAME->cx++;
@@ -189,13 +185,13 @@ editorMoveCursor (int key)
 			FRAME->cx = 0;
 		}
 		break;
-	case ARROW_UP:
+	case KEY_UP:
 		if (FRAME->cy != 0)
 		{
 			FRAME->cy--;
 		}
 		break;
-	case ARROW_DOWN:
+	case KEY_DOWN:
 		if (FRAME->cy < BUFFER->numrows)
 		{
 			FRAME->cy++;
