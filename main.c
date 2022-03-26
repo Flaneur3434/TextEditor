@@ -16,18 +16,14 @@ main (int argc, char *argv[])
 
 	int x = 0;
 
-	while(x < 20)
+	while(x++ < 30)
 	{
 		if (BUFFER->flags.mode == NORMAL_MODE)
 			editorProcessKeypressNormal();
 		else if (BUFFER->flags.mode == VISUAL_MODE)
 			editorProcessKeypressVisual();
 
-		if (BUFFER->flags.mode != NORMAL_MODE)
-			mvwprintw(FRAME->frame, x++, 0, "Changed mode");
-
 		editorRefreshScreen();
-		switchFrame();
 	}
 
 	killFrame();

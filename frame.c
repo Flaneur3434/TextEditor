@@ -11,12 +11,13 @@ editorRefreshScreen (void)
 
 	editorScroll();
 	editorDrawRows();
-	/* editorDrawStatusBar(); */
+	editorDrawStatusBar();
 	/* editorDrawMessageBar(&ab) */;
 
 	/* wprintw(FRAME->frame, "%s", ab.b); */
 
 	wrefresh(FRAME->frame);
+	wrefresh(E.bar->statusBarFrame);
 }
 
 void
@@ -97,15 +98,16 @@ drawWelcome (void)
 	wprintw(FRAME->frame, "%s", welcome);
 }
 
-/* TODO: use ncurses to draw status bar */
 void
 editorDrawStatusBar (void)
 {
-	snprintf(E.bar->statusmsg, sizeof(char) * 80, "%.20s - %d lines %s %s",
+	memset(E.bar->statusmsg, 0, E.bar->statusmsgSize);
+	snprintf(E.bar->statusmsg, E.bar->statusmsgSize, "%.20s - %d lines %s %s",
 	    (BUFFER->filename == NULL) ?  "[No Name]" : BUFFER->filename, BUFFER->numrows,
 	    (BUFFER->flags.dirty == CLEAN) ? "(clean)" : "(modified)",
 	    (BUFFER->flags.mode == NORMAL_MODE) ? "(NORMAL)" : "(VISUAL)");
 
+	werase(E.bar->statusBarFrame);
 	waddstr(E.bar->statusBarFrame, E.bar->statusmsg);
 }
 

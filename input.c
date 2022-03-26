@@ -152,6 +152,12 @@ editorProcessKeypressVisual (void)
 	case ' ':
 		readSpaceMap();
 		break;
+	case ',':
+		switchFrame();
+		break;
+	case '.':
+		/* TODO: Call switchBuffer */
+		break;
 	}
 }
 

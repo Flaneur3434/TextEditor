@@ -47,8 +47,10 @@ editorOpen (char *filename)
 		die("fopen");
 
 	/* TODO: set buffer name to filename */
-	newBuffer("*newfile*", filename);
-	switchBuffer("*newfile*");
+	char *newBufferName;
+	strncpy(newBufferName, filename, sizeof(char) * strlen(filename));
+	newBuffer(&newBufferName, filename);
+	switchBuffer(newBufferName);
 
 	while ((linelen = getline(&line, &linecap, fp)) != -1)
 	{

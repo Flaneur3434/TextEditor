@@ -53,7 +53,7 @@ void saveBufferToTemp (void); /* TODO */
  * then it calls gotoBuffer, and the window will switch to the new buffer
  */
 void listBuffers (void); /* TODO */
-void newBuffer (char *, char *);
+void newBuffer (char **, char *);
 gboolean bufferNamesEquals (gconstpointer, gconstpointer);
 gboolean bufferFileEquals (gconstpointer, gconstpointer);
 

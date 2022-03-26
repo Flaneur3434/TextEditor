@@ -165,8 +165,9 @@ void listBuffers (void)
 	return;
 }
 
-void newBuffer (char *bufferName, char *fileName)
+void newBuffer (char **bufferName, char *fileName)
 {
+	assert(bufferName != NULL);
 	if (E.buffers == NULL)
 		E.buffers = g_ptr_array_sized_new(10);
 
@@ -177,15 +178,13 @@ void newBuffer (char *bufferName, char *fileName)
 	newBuffer->flags.dirty = CLEAN;
 	newBuffer->flags.dirty = NORMAL_MODE;
 	newBuffer->filename = fileName;
-	newBuffer->buffername = bufferName;
-	if (fileName == NULL && bufferName == NULL)
-	{
-		newBuffer->buffername = "*scratch*";
-		/* TODO: very inefficient */
-		if (getBufferIndexName(newBuffer, NULL) == TRUE)
-			g_free(newBuffer);
-	}
-
+	/*
+	 * TODO: just append a hash or something to the bufferName to make it unique
+	 * Have a hashtable with the corisponding bufferList buffer name and the actual buffer name (the one with the has)
+	 * Show the user something like /home/john/Documents/programming/ -- test.c so they can distinguish between files with the same name
+	 * The actual buffer name in the program would be like test.c_asx823
+	 */
+	newBuffer->buffername = *bufferName;
 	newBuffer->row = NULL;
 	g_ptr_array_add(E.buffers, newBuffer);
 }

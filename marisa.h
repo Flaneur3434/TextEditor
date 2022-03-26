@@ -5,6 +5,7 @@
 #define _BSD_SOURCE
 #define _GNU_SOURCE
 
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -61,6 +62,7 @@ typedef struct popupFrame popupFrame;
 struct statusBar {
 	WINDOW *statusBarFrame;
 	char statusmsg[80];
+	size_t statusmsgSize;
 	time_t statusmsg_time;
 };
 
