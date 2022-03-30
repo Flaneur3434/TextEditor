@@ -79,6 +79,8 @@ editorProcessKeypressNormal (void)
 		editorMoveCursor(KEY_RIGHT);
 		__attribute__ ((fallthrough));
 	case KEY_BACKSPACE:
+	/* Dected the ascii code for backspace */
+	case 127:
 		editorDelChar();
 		break;
 	case KEY_NPAGE:

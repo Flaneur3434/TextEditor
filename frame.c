@@ -15,8 +15,10 @@ editorRefreshScreen (void)
 	/* TODO: editorDrawMessageBar(); */
 	/* TODO: editorDrawFrame() which will draw a different frame for the active window */
 
-	wrefresh(FRAME->frame);
-	/* wrefresh(E.bar->statusBarFrame); */
+	if (BUFFER->flags.dirty == DIRTY)
+		wrefresh(FRAME->frame);
+
+	wrefresh(E.bar->statusBarFrame);
 }
 
 void
@@ -74,7 +76,8 @@ editorScroll (void)
 		FRAME->coloff = FRAME->rx - FRAME->screencols + 1;
 	}
 
-	wmove(FRAME->frame, FRAME->rowoff, FRAME->coloff);
+	/* move cursor around the terminal window not the frame */
+	move(FRAME->rowoff, FRAME->coloff);
 }
 
 void
@@ -103,10 +106,11 @@ void
 editorDrawStatusBar (void)
 {
 	memset(E.bar->statusmsg, 0, E.bar->statusmsgSize);
-	snprintf(E.bar->statusmsg, E.bar->statusmsgSize, "%.20s - %d lines %s %s",
+	snprintf(E.bar->statusmsg, E.bar->statusmsgSize, "%.20s - %d lines %s %s | %s",
 	    (BUFFER->filename == NULL) ?  "[No Name]" : BUFFER->filename, BUFFER->numrows,
 	    (BUFFER->flags.dirty == CLEAN) ? "(clean)" : "(modified)",
-	    (BUFFER->flags.mode == NORMAL_MODE) ? "(NORMAL)" : "(VISUAL)");
+	    (BUFFER->flags.mode == NORMAL_MODE) ? "(NORMAL)" : "(VISUAL)",
+	    BUFFER->buffername);
 
 	werase(E.bar->statusBarFrame);
 	waddstr(E.bar->statusBarFrame, E.bar->statusmsg);
@@ -152,9 +156,7 @@ newFrame (WINDOW *ncursesWindow, textEditorBuffer *buffer)
 	newFrame->rx = 0;
 	newFrame->rowoff = 0;
 	newFrame->coloff = 0;
-	/* getmaxyx(ncursesWindow, newFrame->screenrows, newFrame->screencols); */
-	newFrame->screencols = newFrame->frame->_maxy;
-	newFrame->screenrows = newFrame->frame->_maxx;
+	getmaxyx(ncursesWindow, newFrame->screenrows, newFrame->screencols);
 	g_ptr_array_add(E.frames, newFrame);
 }
 

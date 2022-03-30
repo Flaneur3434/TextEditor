@@ -2,6 +2,7 @@
 
 extern editorConfig E;
 
+/* TODO: Change to unicode */
 void
 editorInsertChar (int c)
 {
