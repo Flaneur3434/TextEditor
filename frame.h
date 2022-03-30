@@ -8,8 +8,8 @@ struct frame {
 	textEditorBuffer *currentBuffer;
 	int cx, cy; /* cursor position relative to the file */
 	int rx;     /* cursor's file position after render */
-	int rowoff; /* cursor row (y) position relative to the terminal */
-	int coloff; /* cursor column (x) position relative to the terminal */
+	int rowoff; /* cursor row (y) position relative to the window */
+	int coloff; /* cursor column (x) position relative to the window */
 	int screenrows; /* max frame row */
 	int screencols; /* max frame column */
 };

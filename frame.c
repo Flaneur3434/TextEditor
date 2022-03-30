@@ -12,12 +12,11 @@ editorRefreshScreen (void)
 	editorScroll();
 	editorDrawRows();
 	editorDrawStatusBar();
-	/* editorDrawMessageBar(&ab) */;
-
-	/* wprintw(FRAME->frame, "%s", ab.b); */
+	/* TODO: editorDrawMessageBar(); */
+	/* TODO: editorDrawFrame() which will draw a different frame for the active window */
 
 	wrefresh(FRAME->frame);
-	wrefresh(E.bar->statusBarFrame);
+	/* wrefresh(E.bar->statusBarFrame); */
 }
 
 void
@@ -30,7 +29,7 @@ editorDrawRows (void)
 		{
 			if (BUFFER->numrows == 0 && y == FRAME->screenrows / 3 && BUFFER->filename == NULL)
 			{
-			    drawWelcome();
+				drawWelcome();
 			} else {
 				waddch(FRAME->frame, '~');
 			}
@@ -42,7 +41,7 @@ editorDrawRows (void)
 			if (len > FRAME->screencols)
 				len = FRAME->screencols;
 
-			wprintw(FRAME->frame, "%s", &BUFFER->row[filerow].render[FRAME->coloff]);
+			mvwprintw(FRAME->frame, y, 0, "%s", &BUFFER->row[filerow].render[FRAME->coloff]);
 		}
 
 		waddch(FRAME->frame, '\n');
@@ -74,6 +73,8 @@ editorScroll (void)
 	{
 		FRAME->coloff = FRAME->rx - FRAME->screencols + 1;
 	}
+
+	wmove(FRAME->frame, FRAME->rowoff, FRAME->coloff);
 }
 
 void
@@ -151,7 +152,9 @@ newFrame (WINDOW *ncursesWindow, textEditorBuffer *buffer)
 	newFrame->rx = 0;
 	newFrame->rowoff = 0;
 	newFrame->coloff = 0;
-	getmaxyx(ncursesWindow, newFrame->screenrows, newFrame->screencols);
+	/* getmaxyx(ncursesWindow, newFrame->screenrows, newFrame->screencols); */
+	newFrame->screencols = newFrame->frame->_maxy;
+	newFrame->screenrows = newFrame->frame->_maxx;
 	g_ptr_array_add(E.frames, newFrame);
 }
 

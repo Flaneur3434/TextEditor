@@ -40,19 +40,6 @@
 #define BLURT fprintf(stderr, "%s:%d\tfunction %s %s\n", __FILE__, __LINE__, __func__, E->filename);
 #define SWITCH_MODE (E.currentFrame->currentBuffer->flags.mode = E.currentFrame->currentBuffer->flags.mode == NORMAL_MODE ? VISUAL_MODE : NORMAL_MODE)
 
-enum editorKey {
-	BACKSPACE = 127,
-	ARROW_LEFT = 1000,
-	ARROW_RIGHT,
-	ARROW_UP,
-	ARROW_DOWN,
-	DEL_KEY,
-	HOME_KEY,
-	END_KEY,
-	PAGE_UP,
-	PAGE_DOWN
-};
-
 /*** data ***/
 typedef struct editorConfig editorConfig;
 

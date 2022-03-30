@@ -1,4 +1,4 @@
-Copyright 2019 The age Authors
+Copyright 2022 TextEditor author
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

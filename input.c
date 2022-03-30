@@ -97,7 +97,7 @@ editorProcessKeypressNormal (void)
 
 			times = FRAME->screenrows;
 			while (times--)
-				editorMoveCursor(c == KEY_PPAGE ? ARROW_UP : ARROW_DOWN);
+				editorMoveCursor(c == KEY_PPAGE ? KEY_UP : KEY_DOWN);
 		}
 		break;
 

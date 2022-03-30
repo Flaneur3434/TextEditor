@@ -14,9 +14,7 @@ main (int argc, char *argv[])
 		editorOpen(argv[1]); /* open file in first frame */
 	}
 
-	int x = 0;
-
-	while(x++ < 30)
+	while(1)
 	{
 		if (BUFFER->flags.mode == NORMAL_MODE)
 			editorProcessKeypressNormal();

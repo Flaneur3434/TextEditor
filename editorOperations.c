@@ -10,7 +10,7 @@ editorInsertChar (int c)
 	    bufferInsertRow(BUFFER->numrows, "", 0);
 	}
 
-	bufferRowInsertChar (&BUFFER->row[FRAME->cy], FRAME->cx, c);
+	bufferRowInsertChar(&BUFFER->row[FRAME->cy], FRAME->cx, c);
 	FRAME->cx++;
 }
 

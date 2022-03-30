@@ -130,12 +130,13 @@ bufferRowDelChar (erow *row, int at)
 void killBuffer (textEditorBuffer *bufToBeKilled)
 {
 	if (bufToBeKilled->flags.dirty == DIRTY)
-		/* TODO: ask user to save */
-		return; /* do not return just fall through to the free part */
+	{
+		/* TODO: send a editorMessage using the Message interface */
+		editorSave();
+	}
 
 	guint bufIndex;
 	getBufferIndexName(bufToBeKilled, &bufIndex);
-	/* TODO: close file */
 	g_ptr_array_remove_index_fast(E.buffers, bufIndex);
 }
 
