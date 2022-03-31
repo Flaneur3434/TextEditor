@@ -19,7 +19,7 @@ void editorDrawRows (void);
 void editorScroll (void);
 void drawWelcome (void);
 void editorDrawStatusBar (void);
-void editorSetStatusMessage (const char *, ...);
+void editorSetStatusMessage (const wchar_t *, ...);
 void editorDrawMessageBar (void);
 void newFrame (WINDOW *, textEditorBuffer *);
 void switchBuffer (char *);

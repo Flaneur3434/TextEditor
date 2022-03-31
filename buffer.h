@@ -13,8 +13,8 @@ struct flags {
 struct erow {
 	int size;
 	int rsize;
-	char *chars;
-	char *render;
+	wchar_t *chars;
+	wchar_t *render;
 };
 
 
@@ -34,11 +34,11 @@ struct textEditorBuffer {
 
 int bufferRowCxToRx (erow *, int);
 void bufferUpdateRow (erow *);
-void bufferInsertRow (int, char *, size_t);
+void bufferInsertRow (int, wchar_t *, size_t);
 void bufferFreeRow (erow *);
 void bufferDelRow (int);
 void bufferRowInsertChar (erow *, int, int);
-void bufferRowAppendString (erow *, char *, size_t);
+void bufferRowAppendString (erow *, wchar_t *, size_t);
 void bufferRowDelChar (erow *, int);
 void killBuffer (textEditorBuffer *); /* TODO */
 void readOnlyToggle (void); /* TODO */

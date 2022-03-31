@@ -33,7 +33,7 @@ editorDrawRows (void)
 			{
 				drawWelcome();
 			} else {
-				waddch(FRAME->frame, '~');
+				wprintw(FRAME->frame, "%lc", L'あ');
 			}
 		} else {
 			int len = BUFFER->row[filerow].rsize - FRAME->coloff;
@@ -43,10 +43,10 @@ editorDrawRows (void)
 			if (len > FRAME->screencols)
 				len = FRAME->screencols;
 
-			mvwprintw(FRAME->frame, y, 0, "%s", &BUFFER->row[filerow].render[FRAME->coloff]);
+			mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->coloff]);
 		}
 
-		waddch(FRAME->frame, '\n');
+		wprintw(FRAME->frame,"%lc", L'\n');
 	}
 }
 
@@ -92,12 +92,12 @@ drawWelcome (void)
 	int padding = (FRAME->screencols - welcomelen) / 2;
 	if (padding)
 	{
-		waddch(FRAME->frame, '~');
+		wprintw(FRAME->frame,"%lc", L'~');
 		padding--;
 	}
 
 	while (padding--)
-		waddch(FRAME->frame, ' ');
+		wprintw(FRAME->frame,"%lc", L' ');
 
 	wprintw(FRAME->frame, "%s", welcome);
 }
@@ -106,22 +106,22 @@ void
 editorDrawStatusBar (void)
 {
 	memset(E.bar->statusmsg, 0, E.bar->statusmsgSize);
-	snprintf(E.bar->statusmsg, E.bar->statusmsgSize, "%.20s - %d lines %s %s | %s",
+	swprintf(E.bar->statusmsg, E.bar->statusmsgSize, L"%.20s - %d lines %s %s | %s",
 	    (BUFFER->filename == NULL) ?  "[No Name]" : BUFFER->filename, BUFFER->numrows,
 	    (BUFFER->flags.dirty == CLEAN) ? "(clean)" : "(modified)",
 	    (BUFFER->flags.mode == NORMAL_MODE) ? "(NORMAL)" : "(VISUAL)",
 	    BUFFER->buffername);
 
 	werase(E.bar->statusBarFrame);
-	waddstr(E.bar->statusBarFrame, E.bar->statusmsg);
+	waddwstr(E.bar->statusBarFrame, E.bar->statusmsg);
 }
 
 void
-editorSetStatusMessage (const char *fmt, ...)
+editorSetStatusMessage (const wchar_t *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	vsnprintf(E.bar->statusmsg, sizeof(E.bar->statusmsg), fmt, ap);
+	vswprintf(E.bar->statusmsg, sizeof(E.bar->statusmsg), fmt, ap);
 	va_end(ap);
 	E.bar->statusmsg_time = time(NULL);
 }
@@ -133,7 +133,7 @@ editorDrawMessageBar (void)
 {
 	int msglen;
 	/* abAppend(ab, "\x1b[K", 3); */
-	msglen = strlen(E.bar->statusmsg);
+	msglen = wcslen(E.bar->statusmsg);
 	if (msglen > FRAME->screencols)
 		msglen = FRAME->screencols;
 
@@ -157,6 +157,7 @@ newFrame (WINDOW *ncursesWindow, textEditorBuffer *buffer)
 	newFrame->rowoff = 0;
 	newFrame->coloff = 0;
 	getmaxyx(ncursesWindow, newFrame->screenrows, newFrame->screencols);
+	keypad(newFrame->frame, TRUE);
 	g_ptr_array_add(E.frames, newFrame);
 }
 
@@ -180,7 +181,7 @@ switchFrame (void)
 {
 	guint frameIndex;
 	if (g_ptr_array_find(E.frames, (gconstpointer) FRAME, &frameIndex) == FALSE)
-		die("couldnt switch frame ;-;");
+		die(L"couldnt switch frame ;-;");
 
 	if (++frameIndex == E.frames->len)
 		FRAME = (frame *) g_ptr_array_index(E.frames, 0);
@@ -201,12 +202,12 @@ killFrame (void)
 			return;
 
 		g_ptr_array_remove(E.frames, FRAME);
-		die("Program exited because last frame was killed");
+		die(L"Program exited because last frame was killed");
 	}
 
 	guint frameIndex;
 	if (g_ptr_array_find(E.frames, (gconstpointer) FRAME, &frameIndex) == FALSE)
-		die("couldnt kill frame ;-;");
+		die(L"couldnt kill frame ;-;");
 
 	if (frameIndex == E.frames->len - 1)
 		frameIndex--;

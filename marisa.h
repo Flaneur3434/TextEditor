@@ -20,10 +20,13 @@
 #include <unistd.h>
 #include <curses.h>
 #include <locale.h>
+#include <stddef.h>
+#include <wchar.h>
 #include <glib.h>
 
 #include "buffer.h"
 #include "frame.h"
+#include "utils.h"
 
 #define MARISA_VERSION "0.0.1"
 #define MARISA_TAB_STOP 8
@@ -48,7 +51,7 @@ typedef struct popupFrame popupFrame;
 
 struct statusBar {
 	WINDOW *statusBarFrame;
-	char statusmsg[80];
+	wchar_t statusmsg[80];
 	size_t statusmsgSize;
 	time_t statusmsg_time;
 };
@@ -74,13 +77,13 @@ void editorInsertChar (int);
 void editorInsertNewline (void);
 void editorDelChar (void);
 
-char *editorRowsToString (int *);
+wchar_t *editorRowsToString (int *);
 void editorOpen (char *);
 void editorSave (void);
 
 void initEditor (editorConfig *);
 
-char *editorPrompt (char *);
+char *editorPrompt (wchar_t *);
 void editorProcessKeypressNormal (void);
 void editorProcessKeypressVisual (void);
 void editorMoveCursor (int);
@@ -88,7 +91,7 @@ void editorMoveCursor (int);
 void switchModes (void);
 
 void setupTerm (void);
-void die (const char *);
+void die (const wchar_t *);
 int readKeyChord (void);
 void readSpaceMap (void);
 int editorReadKeyNormal (void);

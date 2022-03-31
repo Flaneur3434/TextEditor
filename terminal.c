@@ -21,11 +21,12 @@ setupTerm (void)
 }
 
 void
-die (const char *s)
+die (const wchar_t *s)
 {
 	endwin();
 
-	perror(s);
+	/* perror(s); */
+	fwprintf(stderr, s);
 	exit(1);
 }
 

@@ -3,7 +3,7 @@
 extern editorConfig E;
 
 char *
-editorPrompt (char *prompt)
+editorPrompt (wchar_t *prompt)
 {
 	size_t bufsize;
 	char *userInput;
@@ -27,7 +27,7 @@ editorPrompt (char *prompt)
 		/* cancle on Esc */
 		else if (c == '\x1b' || (c == KEY_ENTER && userInputLen == 0))
 		{
-			editorSetStatusMessage("");
+			editorSetStatusMessage(L"");
 			free(userInput);
 			return NULL;
 		}
@@ -35,7 +35,7 @@ editorPrompt (char *prompt)
 		{
 			if (userInputLen != 0)
 			{
-				editorSetStatusMessage("");
+				editorSetStatusMessage(L"");
 				return userInput;
 			}
 		}
@@ -58,7 +58,8 @@ void
 editorProcessKeypressNormal (void)
 {
 	int times;
-	int c = wgetch(FRAME->frame);
+	wint_t c;
+	wget_wch(FRAME->frame, &c);
 
 	switch (c)
 	{
@@ -66,7 +67,7 @@ editorProcessKeypressNormal (void)
 		editorInsertNewline();
 		break;
 	case CTRL_KEY('q'):
-		die("User has exitted the program");
+		die(L"User has exitted the program");
 		exit(0);
 		break;
 	case CTRL_KEY('s'):
@@ -130,7 +131,7 @@ editorProcessKeypressVisual (void)
 	case CTRL_KEY('f'):
 		break;
 	case CTRL_KEY('q'):
-		die("Didnt't save? HAHAHAHA");
+		die(L"Didnt't save? HAHAHAHA");
 		break;
 	case CTRL_KEY('s'):
 		editorSave();

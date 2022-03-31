@@ -1,5 +1,5 @@
 PROGRAM = marisa
-FILES.c = buffer.c editorOperations.c file_IO.c frame.c init.c input.c keymap.c main.c terminal.c utils.c
+FILES.c = buffer.c editorOperations.c file_io.c frame.c init.c input.c keymap.c main.c terminal.c utils.c
 FILES.h = marisa.h buffer.h frame.h utils.h
 FILES.o = ${FILES.c:.c=.o}
 

@@ -8,7 +8,7 @@ editorInsertChar (int c)
 {
 	if (FRAME->cy == BUFFER->numrows)
 	{
-	    bufferInsertRow(BUFFER->numrows, "", 0);
+	    bufferInsertRow(BUFFER->numrows, L"", 0);
 	}
 
 	bufferRowInsertChar(&BUFFER->row[FRAME->cy], FRAME->cx, c);
@@ -20,7 +20,7 @@ editorInsertNewline (void)
 {
 	if (FRAME->cx == 0)
 	{
-	    bufferInsertRow(FRAME->cy, "", 0);
+	    bufferInsertRow(FRAME->cy, L"", 0);
 	}
 	else
 	{
@@ -28,7 +28,7 @@ editorInsertNewline (void)
 		bufferInsertRow(FRAME->cy + 1, &row->chars[FRAME->cx], row->size - FRAME->cx);
 		row = &BUFFER->row[FRAME->cy];
 		row->size = FRAME->cx;
-		row->chars[row->size] = '\0';
+		row->chars[row->size] = L'\0';
 		bufferUpdateRow (row);
 	}
 

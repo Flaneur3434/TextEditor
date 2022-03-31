@@ -6,4 +6,9 @@ void autoCompleteFiles (void); /* TODO */
 void highlighMatchingBracketPairs (void); /* TODO */
 void findMatchingBracketPairs (void); /* TODO */
 
+wchar_t *dupstr(const wchar_t *s, size_t n);
+wchar_t *stows(const char *s, size_t n);
+char *wstos(const wchar_t *s, size_t n);
+const char *trimleft(const char *s);
+
 #endif /* MARISA_UTILS header guard */

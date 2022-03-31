@@ -3,12 +3,13 @@
 editorConfig E;
 
 int
-main (int argc, char *argv[])
+main (int argc,  char *argv[])
 {
 	setlocale(LC_CTYPE, "");  /* UTF-8 support */
 	initEditor(&E);
 	setupTerm();
 
+	/* TODO: use getopt */
 	if (argc >= 2)
 	{
 		editorOpen(argv[1]); /* open file in first frame */
@@ -27,7 +28,7 @@ main (int argc, char *argv[])
 	killFrame();
 
 	/* need to free all memory the bufferArray and frameArray have */
-	die("Program has ended");
+	die(L"Program has ended");
 	return 0;
 }
 

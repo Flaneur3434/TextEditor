@@ -1,7 +1,7 @@
 #include "marisa.h"
 
 extern editorConfig E;
-extern char *cwd;   /* current working directory of the program */
+extern wchar_t *cwd;   /* current working directory of the program */
 
 int
 bufferRowCxToRx (erow *row, int cx)
@@ -26,7 +26,7 @@ bufferUpdateRow (erow *row)
 		if (row->chars[i] == '\t') tabs++;
 
 	free(row->render);
-	row->render = (char *) malloc(row->size + tabs*(MARISA_TAB_STOP - 1) + 1);
+	row->render = (wchar_t *) malloc((row->size + tabs*(MARISA_TAB_STOP - 1) + 1) * sizeof(wchar_t));
 
 	for (int i = 0; i < row->size; i++)
 	{
@@ -40,12 +40,12 @@ bufferUpdateRow (erow *row)
 			row->render[idx++] = row->chars[i];
 		}
 	}
-	row->render[idx] = '\0';
+	row->render[idx] = L'\0';
 	row->rsize = idx;
 }
 
 void
-bufferInsertRow (int at, char *s, size_t len)
+bufferInsertRow (int at, wchar_t *s, size_t len)
 {
 	if (at < 0 || at > BUFFER->numrows) return;
 
@@ -53,10 +53,10 @@ bufferInsertRow (int at, char *s, size_t len)
 	memmove(&BUFFER->row[at + 1], &BUFFER->row[at], sizeof(erow) * (BUFFER->numrows - at));
 
 	BUFFER->row[at].size = len;
-	BUFFER->row[at].chars = (char *) malloc(len + 1);
+	BUFFER->row[at].chars = (wchar_t *) malloc((len + 1) * sizeof(wchar_t));
 
 	memcpy(BUFFER->row[at].chars, s, len);
-	BUFFER->row[at].chars[len] = '\0';
+	BUFFER->row[at].chars[len] = L'\0';
 
 	BUFFER->row[at].rsize = 0;
 	BUFFER->row[at].render = NULL;
@@ -92,7 +92,7 @@ bufferRowInsertChar (erow *row, int lineIndex, int c)
 	if (lineIndex < 0 || lineIndex > row->size)
 		lineIndex = row->size;
 
-	row->chars = (char *) realloc(row->chars, row->size + 2);
+	row->chars = (wchar_t *) realloc(row->chars, (row->size + 2) * sizeof(wchar_t));
 	memmove(&row->chars[lineIndex + 1], &row->chars[lineIndex], row->size - lineIndex + 1);
 	row->size++;
 	row->chars[lineIndex] = c;
@@ -101,12 +101,12 @@ bufferRowInsertChar (erow *row, int lineIndex, int c)
 }
 
 void
-bufferRowAppendString (erow *row, char *s, size_t len)
+bufferRowAppendString (erow *row, wchar_t *s, size_t len)
 {
-	row->chars = realloc(row->chars, row->size + len + 1);
+	row->chars = (wchar_t *) realloc(row->chars, (row->size + len + 1) * sizeof(wchar_t));
 	memcpy(&row->chars[row->size], s, len);
 	row->size += len;
-	row->chars[row->size] = '\0';
+	row->chars[row->size] = L'\0';
 	bufferUpdateRow (row);
 	BUFFER->flags.dirty = DIRTY;
 }
