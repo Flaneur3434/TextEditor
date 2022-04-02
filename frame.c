@@ -46,7 +46,7 @@ editorDrawRows (void)
 			mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->coloff]);
 		}
 
-		wprintw(FRAME->frame,"%lc", L'\n');
+		wprintw(FRAME->frame,"%c", '\n');
 	}
 }
 

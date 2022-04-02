@@ -40,7 +40,7 @@ bufferUpdateRow (erow *row)
 			row->render[idx++] = row->chars[i];
 		}
 	}
-	row->render[idx] = L'\0';
+	row->render[idx] = '\0';
 	row->rsize = idx;
 }
 
@@ -55,8 +55,8 @@ bufferInsertRow (int at, wchar_t *s, size_t len)
 	BUFFER->row[at].size = len;
 	BUFFER->row[at].chars = (wchar_t *) malloc((len + 1) * sizeof(wchar_t));
 
-	memcpy(BUFFER->row[at].chars, s, len);
-	BUFFER->row[at].chars[len] = L'\0';
+	wmemcpy(BUFFER->row[at].chars, s, len);
+	BUFFER->row[at].chars[len] = '\0';
 
 	BUFFER->row[at].rsize = 0;
 	BUFFER->row[at].render = NULL;
@@ -106,7 +106,7 @@ bufferRowAppendString (erow *row, wchar_t *s, size_t len)
 	row->chars = (wchar_t *) realloc(row->chars, (row->size + len + 1) * sizeof(wchar_t));
 	memcpy(&row->chars[row->size], s, len);
 	row->size += len;
-	row->chars[row->size] = L'\0';
+	row->chars[row->size] = '\0';
 	bufferUpdateRow (row);
 	BUFFER->flags.dirty = DIRTY;
 }

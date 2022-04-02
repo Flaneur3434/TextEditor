@@ -2,7 +2,6 @@
 
 extern editorConfig E;
 
-/* TODO: Change to unicode */
 void
 editorInsertChar (int c)
 {
@@ -28,7 +27,7 @@ editorInsertNewline (void)
 		bufferInsertRow(FRAME->cy + 1, &row->chars[FRAME->cx], row->size - FRAME->cx);
 		row = &BUFFER->row[FRAME->cy];
 		row->size = FRAME->cx;
-		row->chars[row->size] = L'\0';
+		row->chars[row->size] = '\0';
 		bufferUpdateRow (row);
 	}
 

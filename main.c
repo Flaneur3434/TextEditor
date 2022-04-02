@@ -34,8 +34,6 @@ main (int argc,  char *argv[])
 
 /*
  * TODO: Refresh screen needs to be changed
- * TODO I need a text buffer (erow), which holds the whole file with user edits for each text editor buffer. The ncurses print function are just the screen buffers can shouldnt hold persistent data.
- * TODO: Change all abuf operations to ncurse operations
  *
  * There will be 1 text window which can switch between text editor buffers to show the user
  * There will be 1 status line window

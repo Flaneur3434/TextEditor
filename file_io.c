@@ -36,7 +36,7 @@ void
 editorOpen (char *filename)
 {
 	FILE *fp;
-	wchar_t *line = NULL;
+	wchar_t *line= NULL;
 	char *fileLine = NULL;
 	size_t linecap = 0;
 	ssize_t linelen;
@@ -47,22 +47,24 @@ editorOpen (char *filename)
 	if ((fp = fopen(filename, "r")) == NULL)
 		die(L"fopen");
 
-	/* TODO: set buffer name to filename */
-	char *newBufferName;
-	strncpy(newBufferName, filename, sizeof(char) * strlen(filename));
+	/* copy filename into memory so we can do operations on it. */
+	char *newBufferName = strdup(filename);
 	newBuffer(&newBufferName, filename);
 	switchBuffer(newBufferName);
 
 	while ((linelen = getline(&fileLine, &linecap, fp)) != -1)
 	{
-		line = stows(fileLine, linelen);
+		line = (wchar_t *) malloc(linelen * sizeof(wchar_t));
+		mbstowcs(line, fileLine, linelen);
+		linelen = wcslen(line);
 		while (linelen > 0 && (line[linelen - 1] == '\n' ||
 		    line[linelen - 1] == '\r'))
 			linelen--;
+
 		bufferInsertRow(BUFFER->numrows, line, linelen);
+		free(line);
 	}
 
-	free(line);
 	fclose(fp);
 	BUFFER->flags.dirty = CLEAN;
 }
