@@ -93,7 +93,7 @@ bufferRowInsertChar (erow *row, int lineIndex, int c)
 		lineIndex = row->size;
 
 	row->chars = (wchar_t *) realloc(row->chars, (row->size + 2) * sizeof(wchar_t));
-	memmove(&row->chars[lineIndex + 1], &row->chars[lineIndex], row->size - lineIndex + 1);
+	wmemmove(&row->chars[lineIndex + 1], &row->chars[lineIndex], row->size - lineIndex + 1);
 	row->size++;
 	row->chars[lineIndex] = c;
 	bufferUpdateRow (row);
@@ -104,7 +104,7 @@ void
 bufferRowAppendString (erow *row, wchar_t *s, size_t len)
 {
 	row->chars = (wchar_t *) realloc(row->chars, (row->size + len + 1) * sizeof(wchar_t));
-	memcpy(&row->chars[row->size], s, len);
+	wmemcpy(&row->chars[row->size], s, len);
 	row->size += len;
 	row->chars[row->size] = '\0';
 	bufferUpdateRow (row);
@@ -117,7 +117,7 @@ bufferRowDelChar (erow *row, int at)
 	if (at < 0 || at >= row->size)
 		return;
 
-	memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
+	wmemmove(&row->chars[at], &row->chars[at + 1], row->size - at);
 	row->size--;
 	bufferUpdateRow (row);
 	BUFFER->flags.dirty = DIRTY;

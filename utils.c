@@ -1,7 +1,7 @@
 #include "marisa.h"
 
 wchar_t *
-stows(const char *s, size_t n)
+stows (const char *s, size_t n)
 {
     char *mbs = calloc(n + 1, sizeof(char));
     if (!mbs)
@@ -22,7 +22,7 @@ stows(const char *s, size_t n)
 }
 
 char *
-wstos(const wchar_t *s, size_t n)
+wstos (const wchar_t *s, size_t n)
 {
     wchar_t *wcs = calloc(n + 1, sizeof(wchar_t));
     if (!wcs)
@@ -43,7 +43,7 @@ wstos(const wchar_t *s, size_t n)
 }
 
 wchar_t *
-dupstr(const wchar_t *s, size_t n)
+dupstr (const wchar_t *s, size_t n)
 {
     wchar_t *r = calloc(n + 1, sizeof(wchar_t));
     if (!r)
@@ -53,11 +53,18 @@ dupstr(const wchar_t *s, size_t n)
 }
 
 const char *
-trimleft(const char *s)
+trimleft (const char *s)
 {
    if (!s)
       return NULL;
    while (*s && isspace(*s))
       s++;
    return s;
+}
+
+void
+cursor_set_color_rgb (unsigned char red, unsigned char green, unsigned char blue)
+{
+    printf("\e]12;#%.2x%.2x%.2x\a", red, green, blue);
+    fflush(stdout);
 }

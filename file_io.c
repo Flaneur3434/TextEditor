@@ -23,7 +23,7 @@ editorRowsToString (int *buflen)
 	p = buf;
 	for (int i = 0; i < BUFFER->numrows; i++)
 	{
-		memcpy(p, BUFFER->row[i].chars, BUFFER->row[i].size);
+		wmemcpy(p, BUFFER->row[i].chars, BUFFER->row[i].size);
 		p += BUFFER->row[i].size;
 		*p = '\n';
 		p++;

@@ -13,6 +13,7 @@ main (int argc,  char *argv[])
 	if (argc >= 2)
 	{
 		editorOpen(argv[1]); /* open file in first frame */
+		editorRefreshScreen();
 	}
 
 	while(1)
@@ -34,11 +35,8 @@ main (int argc,  char *argv[])
 
 /*
  * TODO: Refresh screen needs to be changed
- *
- * There will be 1 text window which can switch between text editor buffers to show the user
- * There will be 1 status line window
- * There will be 1 command window where users can input commands into like %s/a/A/g
- * There will be mini-buffers (popups) which hide the status line and command window
+ * When typing a lot of characters and the screen shifts to the right, things breaks
+ * When the cursor is at the end of a long line (where the screen shifts) cursor appears on the wrong line
  *
  * 1. regex searching
  * 2. Undo Redo

@@ -8,6 +8,8 @@ initEditor (editorConfig *E)
 	E->frames = NULL;
 	E->buffers = NULL;
 
+	cursor_set_color_rgb(0xff, 0xff, 0xff);
+
 	char *firstName = "*first*";
 	char *secondName = "*second*";
 	char *thirdName = "*third*";

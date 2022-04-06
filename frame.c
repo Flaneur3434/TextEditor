@@ -18,6 +18,7 @@ editorRefreshScreen (void)
 	if (BUFFER->flags.dirty == DIRTY)
 		wrefresh(FRAME->frame);
 
+	wmove(FRAME->frame, FRAME->cy - FRAME->rowoff, FRAME->cx);
 	wrefresh(E.bar->statusBarFrame);
 }
 
@@ -59,25 +60,29 @@ editorScroll (void)
 		FRAME->rx = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
 	}
 
+	/* if cursor is above the visible window */
 	if (FRAME->cy < FRAME->rowoff)
 	{
 		FRAME->rowoff = FRAME->cy;
 	}
+
+	/* if cursor is below the visible window */
 	if (FRAME->cy >= FRAME->rowoff + FRAME->screenrows)
 	{
-		FRAME->rowoff = FRAME->cy - FRAME->screenrows + 1;
+		FRAME->rowoff = FRAME->cy - FRAME->screenrows + 2; /* add 2 because editorMessage, statusBar */
 	}
+
+	/* if cursor is to the left of the visible window */
 	if (FRAME->rx < FRAME->coloff)
 	{
 		FRAME->coloff = FRAME->rx;
 	}
+
+	/* if cursor is to the right of the visible window */
 	if (FRAME->rx >= FRAME->coloff + FRAME->screencols)
 	{
-		FRAME->coloff = FRAME->rx - FRAME->screencols + 1;
+		FRAME->coloff = FRAME->rx - FRAME->screencols + 1; /* add 1 because padding */
 	}
-
-	/* move cursor around the terminal window not the frame */
-	move(FRAME->rowoff, FRAME->coloff);
 }
 
 void
@@ -106,8 +111,13 @@ void
 editorDrawStatusBar (void)
 {
 	memset(E.bar->statusmsg, 0, E.bar->statusmsgSize);
-	swprintf(E.bar->statusmsg, E.bar->statusmsgSize, L"%.20s - %d lines %s %s | %s",
-	    (BUFFER->filename == NULL) ?  "[No Name]" : BUFFER->filename, BUFFER->numrows,
+	swprintf(E.bar->statusmsg, E.bar->statusmsgSize, L"%.20s - %d lines (%d, %d) (%d, %d) %s %s | %s",
+	    (BUFFER->filename == NULL) ?  "[No Name]" : BUFFER->filename,
+	    BUFFER->numrows,
+	    FRAME->rowoff,
+	    FRAME->coloff,
+	    FRAME->cx,
+	    FRAME->cy,
 	    (BUFFER->flags.dirty == CLEAN) ? "(clean)" : "(modified)",
 	    (BUFFER->flags.mode == NORMAL_MODE) ? "(NORMAL)" : "(VISUAL)",
 	    BUFFER->buffername);
