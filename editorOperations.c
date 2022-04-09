@@ -25,10 +25,7 @@ editorInsertNewline (void)
 	else
 	{
 		erow *row = &BUFFER->row[FRAME->cy];
-
-		bufferInsertRow(FRAME->cy, &row->chars[FRAME->cx], row->size - FRAME->cx);
-
-		/* bufferInsertRow(FRAME->cy + 1, &row->chars[FRAME->cx], row->size - FRAME->cx); */
+		bufferInsertRow(FRAME->cy + 1, &row->chars[FRAME->cx], row->size - FRAME->cx);
 		row = &BUFFER->row[FRAME->cy]; /* need to reassign after bufferInsertRow */
 		row->size = FRAME->cx;
 		row->chars[row->size] = L'\0';

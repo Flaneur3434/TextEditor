@@ -63,6 +63,7 @@ editorProcessKeypressNormal (void)
 
 	switch (c)
 	{
+	case 10:
 	case KEY_ENTER:
 		editorInsertNewline();
 		break;
