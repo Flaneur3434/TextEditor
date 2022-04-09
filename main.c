@@ -38,7 +38,6 @@ main (int argc,  char *argv[])
  * TODO: When line shifts directions, a random wide character sometimes appears on the left side of the screen
  * TODO: When the cursor is at the end of a long line (where the screen shifts) cursor appears on the wrong line
  * TODO: insertChar is not ready for unicode
- * TODO: Entering a new line breaks things
  * TODO: Ncurses cursor does not follow the render correctly (doesnt skip over tabs or wide characters)
  *
  * 1. regex searching

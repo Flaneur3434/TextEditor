@@ -81,14 +81,19 @@ editorDrawRows (void)
 			if (len > FRAME->screencols)
 				len = FRAME->screencols;
 
-			if (FRAME->cx <= FRAME->screencols)
+			if (FRAME->cx - FRAME->screencols <= 0)
 			{
 				mvwprintw(FRAME->frame, y, 0, "%ls", BUFFER->row[filerow].render);
 			}
-			else if (FRAME->cx <= BUFFER->row[filerow].rsize)
+			else if (FRAME->cx - FRAME->screencols <= BUFFER->row[filerow].rsize)
 			{
-				mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->coloff]);
+				mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->cx - FRAME->screencols]);
 			}
+			else
+			{
+				mvwprintw(FRAME->frame, y, 0, "\n");
+			}
+
 		}
 
 		wprintw(FRAME->frame, "\n");
