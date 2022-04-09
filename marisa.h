@@ -22,6 +22,7 @@
 #include <locale.h>
 #include <stddef.h>
 #include <wchar.h>
+#include <wctype.h>
 #include <glib.h>
 
 #include "buffer.h"

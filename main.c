@@ -29,14 +29,17 @@ main (int argc,  char *argv[])
 	killFrame();
 
 	/* need to free all memory the bufferArray and frameArray have */
-	die(L"Program has ended");
+	die(L"Program has ended\n");
 	return 0;
 }
 
 /*
  * TODO: Refresh screen needs to be changed
- * When typing a lot of characters and the screen shifts to the right, things breaks
- * When the cursor is at the end of a long line (where the screen shifts) cursor appears on the wrong line
+ * TODO: When line shifts directions, a random wide character sometimes appears on the left side of the screen
+ * TODO: When the cursor is at the end of a long line (where the screen shifts) cursor appears on the wrong line
+ * TODO: insertChar is not ready for unicode
+ * TODO: Entering a new line breaks things
+ * TODO: Ncurses cursor does not follow the render correctly (doesnt skip over tabs or wide characters)
  *
  * 1. regex searching
  * 2. Undo Redo

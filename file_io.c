@@ -25,7 +25,7 @@ editorRowsToString (int *buflen)
 	{
 		wmemcpy(p, BUFFER->row[i].chars, BUFFER->row[i].size);
 		p += BUFFER->row[i].size;
-		*p = '\n';
+		*p = L'\n';
 		p++;
 	}
 
@@ -57,7 +57,7 @@ editorOpen (char *filename)
 		line = (wchar_t *) malloc(linelen * sizeof(wchar_t));
 		mbstowcs(line, fileLine, linelen);
 		linelen = wcslen(line);
-		while (linelen > 0 && (line[linelen - 1] == '\n' ||
+		while (linelen > 0 && (line[linelen - 1] == L'\n' ||
 		    line[linelen - 1] == '\r'))
 			linelen--;
 

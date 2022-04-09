@@ -9,7 +9,7 @@ editorRefreshScreen (void)
 		/* TODO: Resize handling */
 		return;
 
-	editorScroll();
+	editorScroll(); /* can be optimized by moving function call into a magically conditional */
 	editorDrawRows();
 	editorDrawStatusBar();
 	/* TODO: editorDrawMessageBar(); */
@@ -18,37 +18,8 @@ editorRefreshScreen (void)
 	if (BUFFER->flags.dirty == DIRTY)
 		wrefresh(FRAME->frame);
 
-	wmove(FRAME->frame, FRAME->cy - FRAME->rowoff, FRAME->cx);
+	wmove(FRAME->frame, FRAME->cy - FRAME->rowoff, FRAME->cx - FRAME->coloff);
 	wrefresh(E.bar->statusBarFrame);
-}
-
-void
-editorDrawRows (void)
-{
-	for (int y = 0; y < FRAME->screenrows; y++)
-	{
-		int filerow = y + FRAME->rowoff;
-		if (filerow >= BUFFER->numrows)
-		{
-			if (BUFFER->numrows == 0 && y == FRAME->screenrows / 3 && BUFFER->filename == NULL)
-			{
-				drawWelcome();
-			} else {
-				wprintw(FRAME->frame, "%lc", L'あ');
-			}
-		} else {
-			int len = BUFFER->row[filerow].rsize - FRAME->coloff;
-			if (len < 0)
-				len = 0;
-
-			if (len > FRAME->screencols)
-				len = FRAME->screencols;
-
-			mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->coloff]);
-		}
-
-		wprintw(FRAME->frame,"%c", '\n');
-	}
 }
 
 void
@@ -83,6 +54,45 @@ editorScroll (void)
 	{
 		FRAME->coloff = FRAME->rx - FRAME->screencols + 1; /* add 1 because padding */
 	}
+
+	/* TODO: Handle scrolling on wide characters */
+}
+
+void
+editorDrawRows (void)
+{
+
+	for (int y = 0; y < FRAME->screenrows; y++)
+	{
+		int filerow = y + FRAME->rowoff;
+		if (filerow >= BUFFER->numrows)
+		{
+			if (BUFFER->numrows == 0 && y == FRAME->screenrows / 3 && BUFFER->filename == NULL)
+			{
+				drawWelcome();
+			} else {
+				wprintw(FRAME->frame, "%lc", L'あ');
+			}
+		} else {
+			int len = BUFFER->row[filerow].rsize - FRAME->coloff;
+			if (len < 0)
+				len = 0;
+
+			if (len > FRAME->screencols)
+				len = FRAME->screencols;
+
+			if (FRAME->cx <= FRAME->screencols)
+			{
+				mvwprintw(FRAME->frame, y, 0, "%ls", BUFFER->row[filerow].render);
+			}
+			else if (FRAME->cx <= BUFFER->row[filerow].rsize)
+			{
+				mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->coloff]);
+			}
+		}
+
+		wprintw(FRAME->frame, "\n");
+	}
 }
 
 void
@@ -116,8 +126,8 @@ editorDrawStatusBar (void)
 	    BUFFER->numrows,
 	    FRAME->rowoff,
 	    FRAME->coloff,
-	    FRAME->cx,
-	    FRAME->cy,
+	    FRAME->cx + 1,
+	    FRAME->cy + 1,
 	    (BUFFER->flags.dirty == CLEAN) ? "(clean)" : "(modified)",
 	    (BUFFER->flags.mode == NORMAL_MODE) ? "(NORMAL)" : "(VISUAL)",
 	    BUFFER->buffername);
