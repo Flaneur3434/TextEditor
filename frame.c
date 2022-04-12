@@ -18,7 +18,7 @@ editorRefreshScreen (void)
 	if (BUFFER->flags.dirty == DIRTY)
 		wrefresh(FRAME->frame);
 
-	wmove(FRAME->frame, FRAME->cy - FRAME->rowoff, FRAME->cx - FRAME->coloff);
+	wmove(FRAME->frame, FRAME->cy - FRAME->rowoff, FRAME->rx - FRAME->coloff);
 	wrefresh(E.bar->statusBarFrame);
 }
 
@@ -91,12 +91,10 @@ editorDrawRows (void)
 			}
 			else
 			{
-				mvwprintw(FRAME->frame, y, 0, "\n");
+				mvwprintw(FRAME->frame, y, 0, "%lc", L'\n');
 			}
-
 		}
-
-		wprintw(FRAME->frame, "\n");
+		wprintw(FRAME->frame, "%lc", L'\n');
 	}
 }
 

@@ -3,6 +3,10 @@
 extern editorConfig E;
 extern wchar_t *cwd;   /* current working directory of the program */
 
+/*
+ * TODO: Cursor position doesnt reflect the rendered position
+ */
+
 int
 bufferRowCxToRx (erow *row, int cx)
 {
@@ -10,15 +14,17 @@ bufferRowCxToRx (erow *row, int cx)
 	for (int i = 0; i < cx; i++)
 	{
 		wchar_t w = row->chars[i];
-		if (w == '\t')
+		if (w == L'\t')
 		{
-			rx += (MARISA_TAB_STOP - 1) - (rx % MARISA_TAB_STOP);
+			rx += (MARISA_TAB_STOP) - (rx % MARISA_TAB_STOP);
 		}
-		rx++;
+		else
+		{
+			rx += wcwidth(w);
+		}
 	}
 	return rx;
 }
-/* TODO: bufferUpdateRow and bufferRowCxToRx need to consider wide characters when counting the render and char */
 
 void
 bufferUpdateRow (erow *row)
@@ -27,14 +33,14 @@ bufferUpdateRow (erow *row)
 	int idx = 0;
 
 	for (int i = 0; i < row->size; i++)
-		if (row->chars[i] == '\t') tabs++;
+		if (row->chars[i] == L'\t') tabs++;
 
 	free(row->render);
 	row->render = (wchar_t *) malloc((row->size + tabs * MARISA_TAB_STOP + 1) * sizeof(wchar_t));
 
 	for (int i = 0; i < row->size; i++)
 	{
-		if (row->chars[i] == '\t')
+		if (row->chars[i] == L'\t')
 		{
 			row->render[idx++] = ' ';
 			while (idx % MARISA_TAB_STOP != 0) row->render[idx++] = ' ';

@@ -39,6 +39,7 @@ main (int argc,  char *argv[])
  * TODO: When the cursor is at the end of a long line (where the screen shifts) cursor appears on the wrong line
  * TODO: insertChar is not ready for unicode
  * TODO: Ncurses cursor does not follow the render correctly (doesnt skip over tabs or wide characters)
+ * TODO: Save not working (idk the problem but may be the difference between render buffer and char buffer)
  *
  * 1. regex searching
  * 2. Undo Redo
