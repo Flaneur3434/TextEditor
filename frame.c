@@ -15,17 +15,19 @@ editorRefreshScreen (void)
 	/* TODO: editorDrawMessageBar(); */
 	/* TODO: editorDrawFrame() which will draw a different frame for the active window */
 
-	if (BUFFER->flags.dirty == DIRTY)
-		wrefresh(FRAME->frame);
+	wrefresh(E.bar->statusBarFrame);
 
 	wmove(FRAME->frame, FRAME->cy - FRAME->rowoff, FRAME->rx - FRAME->coloff);
-	wrefresh(E.bar->statusBarFrame);
+	wrefresh(FRAME->frame);
 }
 
 void
 editorScroll (void)
 {
-	FRAME->rx = 0;
+	/*
+	 * TODO: buffer the output of bufferRowCxToRx, very inefficent to call it every time the cursor moves
+	 *       Move to like bufferInsertChar
+	 */
 	if (FRAME->cy < BUFFER->numrows)
 	{
 		FRAME->rx = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
@@ -149,6 +151,8 @@ newFrame (WINDOW *ncursesWindow, textEditorBuffer *buffer)
 	newFrame->rowoff = 0;
 	newFrame->coloff = 0;
 	getmaxyx(ncursesWindow, newFrame->screenrows, newFrame->screencols);
+	/* padding is needed because ncurses bug that moves cursor to wrong position when it hits the end of screen */
+	newFrame->screencols -= 1;
 	keypad(newFrame->frame, TRUE);
 	g_ptr_array_add(E.frames, newFrame);
 }

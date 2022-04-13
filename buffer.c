@@ -204,7 +204,7 @@ void newBuffer (char **bufferName, char *fileName)
 gboolean
 bufferNamesEquals (gconstpointer a, gconstpointer b)
 {
-	if (strcmp(((textEditorBuffer *) a)->buffername, ((textEditorBuffer *) b)->buffername) == 0)
+	if (strcmp(((const textEditorBuffer *) a)->buffername, ((const textEditorBuffer *) b)->buffername) == 0)
 		return TRUE;
 
 	return FALSE;
@@ -213,7 +213,7 @@ bufferNamesEquals (gconstpointer a, gconstpointer b)
 gboolean
 bufferFileEquals (gconstpointer a, gconstpointer b)
 {
-      	if (strcmp(((textEditorBuffer *) a)->filename, ((textEditorBuffer *) b)->filename) == 0)
+      	if (strcmp(((const textEditorBuffer *) a)->filename, ((const textEditorBuffer *) b)->filename) == 0)
 		return TRUE;
 
 	return FALSE;

@@ -27,10 +27,15 @@ WFLAG11 = -Wvector-operation-performance
 WFLAG12 = -Wredundant-decls
 WFLAG13 = -Wmissing-field-initializers
 WFLAG14 = -Wpointer-arith
+WFLAG15 = -Wfloat-equal
+WFLAG16 = -Wcast-qual
+WFLAG17 = -Wbad-function-cast
+WFLAG18 = -Wundef
+WFLAG19 = -Wmaybe-uninitialized
 
 LIB1    = -lncursesw
 
-WFLAGS  = ${WFLAG1} ${WFLAG2} ${WFLAG3} ${WFLAG4} ${WFLAG5} ${WFLAG6} ${WFLAG7} ${WFLAG8} ${WFLAG9} ${WFLAG10} ${WFLAG11} ${WFLAG12} ${WFLAG13} ${WFLAG14}
+WFLAGS  = ${WFLAG1} ${WFLAG2} ${WFLAG3} ${WFLAG4} ${WFLAG5} ${WFLAG6} ${WFLAG7} ${WFLAG8} ${WFLAG9} ${WFLAG10} ${WFLAG11} ${WFLAG12} ${WFLAG13} ${WFLAG14} ${WFLAG15} ${WFLAG16} ${WFLAG17} ${WFLAG18} ${WFLAG19}
 
 UFLAGS  = # Set on command line only
 
