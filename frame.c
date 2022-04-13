@@ -54,8 +54,6 @@ editorScroll (void)
 	{
 		FRAME->coloff = FRAME->rx - FRAME->screencols + 1; /* add 1 because padding */
 	}
-
-	/* TODO: Handle scrolling on wide characters */
 }
 
 void
@@ -81,20 +79,20 @@ editorDrawRows (void)
 			if (len > FRAME->screencols)
 				len = FRAME->screencols;
 
-			if (FRAME->cx - FRAME->screencols <= 0)
+			if (FRAME->rx - FRAME->screencols <= 0)
 			{
 				mvwprintw(FRAME->frame, y, 0, "%ls", BUFFER->row[filerow].render);
 			}
-			else if (FRAME->cx - FRAME->screencols <= BUFFER->row[filerow].rsize)
+			else if (FRAME->rx - FRAME->screencols <= BUFFER->row[filerow].rsize)
 			{
-				mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->cx - FRAME->screencols]);
+				mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->rx - FRAME->screencols]);
 			}
 			else
 			{
-				mvwprintw(FRAME->frame, y, 0, "%lc", L'\n');
+				mvwprintw(FRAME->frame, y, 0, "%c", '\n');
 			}
 		}
-		wprintw(FRAME->frame, "%lc", L'\n');
+		wprintw(FRAME->frame, "%c", '\n');
 	}
 }
 

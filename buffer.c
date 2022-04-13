@@ -14,7 +14,7 @@ bufferRowCxToRx (erow *row, int cx)
 	for (int i = 0; i < cx; i++)
 	{
 		wchar_t w = row->chars[i];
-		if (w == L'\t')
+		if (w == '\t')
 		{
 			rx += (MARISA_TAB_STOP) - (rx % MARISA_TAB_STOP);
 		}
@@ -33,14 +33,15 @@ bufferUpdateRow (erow *row)
 	int idx = 0;
 
 	for (int i = 0; i < row->size; i++)
-		if (row->chars[i] == L'\t') tabs++;
+		if (row->chars[i] == '\t')
+			tabs++;
 
 	free(row->render);
 	row->render = (wchar_t *) malloc((row->size + tabs * MARISA_TAB_STOP + 1) * sizeof(wchar_t));
 
 	for (int i = 0; i < row->size; i++)
 	{
-		if (row->chars[i] == L'\t')
+		if (row->chars[i] == '\t')
 		{
 			row->render[idx++] = ' ';
 			while (idx % MARISA_TAB_STOP != 0) row->render[idx++] = ' ';
@@ -50,7 +51,7 @@ bufferUpdateRow (erow *row)
 			row->render[idx++] = row->chars[i];
 		}
 	}
-	row->render[idx] = L'\0';
+	row->render[idx] = '\0';
 	row->rsize = idx;
 }
 
@@ -66,7 +67,7 @@ bufferInsertRow (int at, wchar_t *s, size_t len)
 	BUFFER->row[at].chars = (wchar_t *) malloc((len + 1) * sizeof(wchar_t));
 
 	wmemcpy(BUFFER->row[at].chars, s, len);
-	BUFFER->row[at].chars[len] = L'\0';
+	BUFFER->row[at].chars[len] = '\0';
 
 	BUFFER->row[at].rsize = 0;
 	BUFFER->row[at].render = NULL;
@@ -116,7 +117,7 @@ bufferRowAppendString (erow *row, wchar_t *s, size_t len)
 	row->chars = (wchar_t *) realloc(row->chars, (row->size + len + 1) * sizeof(wchar_t));
 	wmemcpy(&row->chars[row->size], s, len);
 	row->size += len;
-	row->chars[row->size] = L'\0';
+	row->chars[row->size] = '\0';
 	bufferUpdateRow (row);
 	BUFFER->flags.dirty = DIRTY;
 }

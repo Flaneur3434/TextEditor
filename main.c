@@ -34,12 +34,9 @@ main (int argc,  char *argv[])
 }
 
 /*
- * TODO: Refresh screen needs to be changed
  * TODO: When line shifts directions, a random wide character sometimes appears on the left side of the screen
- * TODO: When the cursor is at the end of a long line (where the screen shifts) cursor appears on the wrong line
- * TODO: insertChar is not ready for unicode
- * TODO: Ncurses cursor does not follow the render correctly (doesnt skip over tabs or wide characters)
  * TODO: Save not working (idk the problem but may be the difference between render buffer and char buffer)
+ * TODO: When on a long line, that the user inputed (not read in from a file) and the user scrolls from the end to the beginning, it messes up the screen (only happens if next line is the end of the buffer)
  *
  * 1. regex searching
  * 2. Undo Redo
