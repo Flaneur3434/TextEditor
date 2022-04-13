@@ -37,6 +37,7 @@ main (int argc,  char *argv[])
  * TODO: When line shifts directions, a random wide character sometimes appears on the left side of the screen
  * TODO: Save not working (idk the problem but may be the difference between render buffer and char buffer)
  * TODO: When on a long line, that the user inputed (not read in from a file) and the user scrolls from the end to the beginning, it messes up the screen (only happens if next line is the end of the buffer)
+ * TODO: The cx and rx values are wrong because it takes 2 right arrow presses to move off screen
  *
  * 1. regex searching
  * 2. Undo Redo

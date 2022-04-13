@@ -3,22 +3,18 @@
 wchar_t *
 stows (const char *s, size_t n)
 {
-    char *mbs = calloc(n + 1, sizeof(char));
-    if (!mbs)
-        return NULL;
-    strncpy(mbs, s, n);
+	char *mbs = strndup(s, n);
+	/* used to count number of potential wide characters */
+	size_t wcn = mbstowcs(NULL, mbs, 0);
 
-    size_t wcn = mbstowcs(NULL, mbs, 0);
-    wchar_t *wcs = calloc(wcn + 1, sizeof(wchar_t));
-    if (!wcs)
-        return free(mbs), NULL;
+	wchar_t *wcs = calloc(wcn + 1, sizeof(wchar_t));
+	if (!wcs) return free(mbs), NULL;
 
-    size_t wcr = mbstowcs(wcs, mbs, wcn);
-    if (wcr == (size_t)-1)
-        return free(mbs), free(wcs), NULL;
+	size_t wcr = mbstowcs(wcs, mbs, wcn);
+	if (wcr == (size_t) -1) return free(mbs), free(wcs), NULL;
 
-    free(mbs);
-    return wcs;
+	free(mbs);
+	return wcs;
 }
 
 char *

@@ -65,6 +65,7 @@ editorOpen (char *filename)
 		free(line);
 	}
 
+	free(fileLine);
 	fclose(fp);
 	BUFFER->flags.dirty = CLEAN;
 }
@@ -84,6 +85,7 @@ editorSave (void)
 		return;
 	}
 
+	/* TODO: editorRowsToString is setting len to a wrong value */
 	if ((buf = editorRowsToString(&len)) == NULL || BUFFER->flags.dirty == CLEAN)
 	{
 		editorSetStatusMessage(L"Nothing to save...");

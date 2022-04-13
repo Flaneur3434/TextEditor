@@ -31,35 +31,13 @@ editorScroll (void)
 		FRAME->rx = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
 	}
 
-	/* if cursor is above the visible window */
-	if (FRAME->cy < FRAME->rowoff)
-	{
-		FRAME->rowoff = FRAME->cy;
-	}
-
-	/* if cursor is below the visible window */
-	if (FRAME->cy >= FRAME->rowoff + FRAME->screenrows)
-	{
-		FRAME->rowoff = FRAME->cy - FRAME->screenrows + 2; /* add 2 because editorMessage, statusBar */
-	}
-
-	/* if cursor is to the left of the visible window */
-	if (FRAME->rx < FRAME->coloff)
-	{
-		FRAME->coloff = FRAME->rx;
-	}
-
-	/* if cursor is to the right of the visible window */
-	if (FRAME->rx >= FRAME->coloff + FRAME->screencols)
-	{
-		FRAME->coloff = FRAME->rx - FRAME->screencols + 1; /* add 1 because padding */
-	}
+	FRAME->rowoff = FRAME->cy - FRAME->screenrows < 0 ? 0 : FRAME->cy - FRAME->screenrows;
+	FRAME->coloff = FRAME->rx - FRAME->screencols < 0 ? 0 : FRAME->rx - FRAME->screencols;
 }
 
 void
 editorDrawRows (void)
 {
-
 	for (int y = 0; y < FRAME->screenrows; y++)
 	{
 		int filerow = y + FRAME->rowoff;
@@ -72,20 +50,13 @@ editorDrawRows (void)
 				wprintw(FRAME->frame, "%lc", L'あ');
 			}
 		} else {
-			int len = BUFFER->row[filerow].rsize - FRAME->coloff;
-			if (len < 0)
-				len = 0;
-
-			if (len > FRAME->screencols)
-				len = FRAME->screencols;
-
-			if (FRAME->rx - FRAME->screencols <= 0)
+			if (FRAME->coloff == 0)
 			{
 				mvwprintw(FRAME->frame, y, 0, "%ls", BUFFER->row[filerow].render);
 			}
-			else if (FRAME->rx - FRAME->screencols <= BUFFER->row[filerow].rsize)
+			else if (FRAME->coloff <= BUFFER->row[filerow].rsize)
 			{
-				mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->rx - FRAME->screencols]);
+				mvwprintw(FRAME->frame, y, 0, "%ls", &BUFFER->row[filerow].render[FRAME->coloff]);
 			}
 			else
 			{
@@ -122,7 +93,7 @@ void
 editorDrawStatusBar (void)
 {
 	memset(E.bar->statusmsg, 0, E.bar->statusmsgSize);
-	swprintf(E.bar->statusmsg, E.bar->statusmsgSize, L"%.20s - %d lines (%d, %d) (%d, %d) %s %s | %s",
+	swprintf(E.bar->statusmsg, E.bar->statusmsgSize, L"%.20s - %d lines offset: (%d, %d) (%d, %d) %s %s | %s",
 	    (BUFFER->filename == NULL) ?  "[No Name]" : BUFFER->filename,
 	    BUFFER->numrows,
 	    FRAME->rowoff,
