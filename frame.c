@@ -17,6 +17,10 @@ editorRefreshScreen (void)
 
 	wrefresh(E.bar->statusBarFrame);
 
+	werase(((frame *) g_ptr_array_index(E.frames, 1))->frame);
+	wprintw(((frame *) g_ptr_array_index(E.frames, 1))->frame, "cursor pos\ty: %d, x: %d\n", FRAME->cy - FRAME->rowoff, FRAME->rx - FRAME->coloff);
+	wrefresh(((frame *) g_ptr_array_index(E.frames, 1))->frame);
+
 	wmove(FRAME->frame, FRAME->cy - FRAME->rowoff, FRAME->rx - FRAME->coloff);
 	wrefresh(FRAME->frame);
 }
@@ -24,6 +28,9 @@ editorRefreshScreen (void)
 void
 editorScroll (void)
 {
+	FRAME->rx = 0; /* TODO: understand what this does.
+	FIXES: When scrolling to the end of a line, the cursor moves to the next row even if no line is there */
+
 	/*
 	 * TODO: buffer the output of bufferRowCxToRx, very inefficent to call it every time the cursor moves
 	 *       Move to like bufferInsertChar
@@ -33,8 +40,8 @@ editorScroll (void)
 		FRAME->rx = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
 	}
 
-	FRAME->rowoff = FRAME->cy - FRAME->screenrows < 0 ? 0 : FRAME->cy - FRAME->screenrows;
-	FRAME->coloff = FRAME->rx - FRAME->screencols < 0 ? 0 : FRAME->rx - FRAME->screencols;
+	FRAME->rowoff = FRAME->cy - FRAME->screenrows < 0 ? 0 : FRAME->cy - FRAME->screenrows + 2;
+	FRAME->coloff = FRAME->rx - FRAME->screencols < 0 ? 0 : FRAME->rx - FRAME->screencols + 1;
 }
 
 void
@@ -49,7 +56,7 @@ editorDrawRows (void)
 			{
 				drawWelcome();
 			} else {
-				wprintw(FRAME->frame, "%lc", L'あ');
+				mvwprintw(FRAME->frame, y, 0, "%lc", L'~');
 			}
 		} else {
 			if (FRAME->coloff == 0)
@@ -100,8 +107,8 @@ editorDrawStatusBar (void)
 	    BUFFER->numrows,
 	    FRAME->rowoff,
 	    FRAME->coloff,
-	    FRAME->cx + 1,
 	    FRAME->cy + 1,
+	    FRAME->cx + 1,
 	    (BUFFER->flags.dirty == CLEAN) ? "(clean)" : "(modified)",
 	    (BUFFER->flags.mode == NORMAL_MODE) ? "(NORMAL)" : "(VISUAL)",
 	    BUFFER->buffername);

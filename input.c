@@ -168,7 +168,6 @@ editorProcessKeypressVisual (void)
 void
 editorMoveCursor (int key)
 {
-	int rowlen;
 	erow *row = (FRAME->cy >= BUFFER->numrows) ? NULL : &BUFFER->row[FRAME->cy];
 
 	switch (key)
@@ -210,7 +209,7 @@ editorMoveCursor (int key)
 	}
 
 	row = (FRAME->cy >= BUFFER->numrows) ? NULL : &BUFFER->row[FRAME->cy];
-	rowlen = (row != NULL) ? row->size : 0;
+	int rowlen = (row != NULL) ? row->size : 0;
 	if (FRAME->cx > rowlen)
 	{
 		FRAME->cx = rowlen;
