@@ -6,8 +6,8 @@ int
 main (int argc,  char *argv[])
 {
 	setlocale(LC_CTYPE, "");  /* UTF-8 support */
-	initEditor(&E);
 	setupTerm();
+	initEditor(&E);
 
 	/* TODO: use getopt */
 	if (argc >= 2)

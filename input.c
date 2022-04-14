@@ -12,15 +12,18 @@ editorPrompt (wchar_t *prompt)
 	bufsize = 128;
 	if ((userInput = (char *) malloc(bufsize)) == NULL) return NULL;
 	userInputLen = 0;
-
 	userInput[0] = '\0';
+
 	while (1)
 	{
 		editorSetStatusMessage(prompt, userInput);
-		editorRefreshScreen();
-		BUFFER->flags.mode = NORMAL_MODE;
-		int c = wgetch(FRAME->frame);
-		if (c == KEY_DC || c == KEY_BACKSPACE)
+		editorDrawMessageBar();
+
+		wmove(E.bar->statusBarFrame, 0, E.bar->statusmsgSize);
+		wrefresh(E.bar->statusBarFrame);
+
+		int c = wgetch(E.bar->statusBarFrame);
+		if (c == KEY_DC || c == KEY_BACKSPACE || c == 127)
 		{
 			if (userInputLen != 0) userInput[--userInputLen] = '\0';
 		}
@@ -29,14 +32,22 @@ editorPrompt (wchar_t *prompt)
 		{
 			editorSetStatusMessage(L"");
 			free(userInput);
+			/* restore statusmsgSize to original */
+			E.bar->statusmsgSize = FRAME->screencols;
 			return NULL;
 		}
-		else if (c == KEY_ENTER)
+		else if (c == KEY_ENTER || c == 10)
 		{
 			if (userInputLen != 0)
 			{
 				editorSetStatusMessage(L"");
 				return userInput;
+			}
+			else
+			{
+				free(userInput);
+				E.bar->statusmsgSize = FRAME->screencols;
+				return NULL;
 			}
 		}
 		/* only ascii characters */

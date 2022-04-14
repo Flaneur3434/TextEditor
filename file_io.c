@@ -78,7 +78,7 @@ editorSave (void)
 	wchar_t *buf;
 
 	if (BUFFER->filename == NULL)
-		BUFFER->filename = editorPrompt(L"Save as: %s (ESC to cancel)");
+		BUFFER->filename = editorPrompt(L"Save as: %s");
 
 	if (BUFFER->filename == NULL) {
 		editorSetStatusMessage(L"Save aborted");

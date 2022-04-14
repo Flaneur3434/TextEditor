@@ -12,14 +12,8 @@ editorRefreshScreen (void)
 	editorScroll(); /* can be optimized by moving function call into a magically conditional */
 	editorDrawRows();
 	editorDrawStatusBar();
-	/* TODO: editorDrawMessageBar(); */
+	editorDrawMessageBar();
 	/* TODO: editorDrawFrame() which will draw a different frame for the active window */
-
-	wrefresh(E.bar->statusBarFrame);
-
-	werase(((frame *) g_ptr_array_index(E.frames, 1))->frame);
-	wprintw(((frame *) g_ptr_array_index(E.frames, 1))->frame, "cursor pos\ty: %d, x: %d\n", FRAME->cy - FRAME->rowoff, FRAME->rx - FRAME->coloff);
-	wrefresh(((frame *) g_ptr_array_index(E.frames, 1))->frame);
 
 	wmove(FRAME->frame, FRAME->cy - FRAME->rowoff, FRAME->rx - FRAME->coloff);
 	wrefresh(FRAME->frame);
@@ -115,6 +109,7 @@ editorDrawStatusBar (void)
 
 	werase(E.bar->statusBarFrame);
 	waddwstr(E.bar->statusBarFrame, E.bar->statusmsg);
+	wrefresh(E.bar->statusBarFrame);
 }
 
 void
@@ -127,20 +122,20 @@ editorSetStatusMessage (const wchar_t *fmt, ...)
 	E.bar->statusmsg_time = time(NULL);
 }
 
-
-/* TODO: use ncurses to print status bar message */
 void
 editorDrawMessageBar (void)
 {
 	int msglen;
-	/* abAppend(ab, "\x1b[K", 3); */
 	msglen = wcslen(E.bar->statusmsg);
 	if (msglen > FRAME->screencols)
 		msglen = FRAME->screencols;
 
 	if (msglen && time(NULL) - E.bar->statusmsg_time < 5)
-		return;
-		/* abAppend(ab, E.bar->statusmsg, msglen); */
+	{
+		E.bar->statusmsgSize = msglen;
+		werase(E.bar->statusBarFrame);
+		waddwstr(E.bar->statusBarFrame, E.bar->statusmsg);
+	}
 }
 
 void
@@ -161,6 +156,7 @@ newFrame (WINDOW *ncursesWindow, textEditorBuffer *buffer)
 	/* padding is needed because ncurses bug that moves cursor to wrong position when it hits the end of screen */
 	newFrame->screencols -= 1;
 	keypad(newFrame->frame, TRUE);
+	clearok(newFrame->frame, TRUE);
 	g_ptr_array_add(E.frames, newFrame);
 }
 
