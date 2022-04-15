@@ -48,13 +48,22 @@
 typedef struct editorConfig editorConfig;
 
 typedef struct statusBar statusBar;
+typedef struct messageBar messageBar;
 typedef struct popupFrame popupFrame;
 
+/* TODO: rename these */
 struct statusBar {
 	WINDOW *statusBarFrame;
 	wchar_t statusmsg[80];
 	size_t statusmsgSize;
 	time_t statusmsg_time;
+};
+
+struct messageBar {
+	WINDOW *messageBarFrame;
+	wchar_t message[80];
+	size_t messageLen;
+	time_t messageTime;
 };
 
 struct popupFrame {
@@ -66,6 +75,7 @@ struct editorConfig {
 	GPtrArray *buffers;        /* pointer to head of  buffer linked list */
 	frame *currentFrame;
 	statusBar *bar;
+	messageBar *mes;
 	int numOfFrames;           /* number of frames starting from 0 */
 	int numOfBuffer;           /* number of frames starting from 0 */
 

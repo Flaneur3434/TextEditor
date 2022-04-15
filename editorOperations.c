@@ -14,7 +14,6 @@ editorInsertChar (int c)
 	FRAME->cx++;
 }
 
-/* TODO: After a insert newline, the cursor positon is off */
 void
 editorInsertNewline (void)
 {

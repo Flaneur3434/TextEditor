@@ -34,7 +34,7 @@ main (int argc,  char *argv[])
 }
 
 /*
- * TODO: Save not working (idk the problem but may be the difference between render buffer and char buffer)
+ * TODO: editor message wont disappear after 3 secs
  *
  * 1. regex searching
  * 2. Undo Redo

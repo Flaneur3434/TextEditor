@@ -19,10 +19,10 @@ editorPrompt (wchar_t *prompt)
 		editorSetStatusMessage(prompt, userInput);
 		editorDrawMessageBar();
 
-		wmove(E.bar->statusBarFrame, 0, E.bar->statusmsgSize);
-		wrefresh(E.bar->statusBarFrame);
+		wmove(E.mes->messageBarFrame, 0, E.mes->messageLen);
+		wrefresh(E.mes->messageBarFrame);
 
-		int c = wgetch(E.bar->statusBarFrame);
+		int c = wgetch(E.mes->messageBarFrame);
 		if (c == KEY_DC || c == KEY_BACKSPACE || c == 127)
 		{
 			if (userInputLen != 0) userInput[--userInputLen] = '\0';
@@ -33,7 +33,7 @@ editorPrompt (wchar_t *prompt)
 			editorSetStatusMessage(L"");
 			free(userInput);
 			/* restore statusmsgSize to original */
-			E.bar->statusmsgSize = FRAME->screencols;
+			E.mes->messageLen = FRAME->screencols;
 			return NULL;
 		}
 		else if (c == KEY_ENTER || c == 10)
@@ -46,7 +46,7 @@ editorPrompt (wchar_t *prompt)
 			else
 			{
 				free(userInput);
-				E.bar->statusmsgSize = FRAME->screencols;
+				E.mes->messageLen = FRAME->screencols;
 				return NULL;
 			}
 		}

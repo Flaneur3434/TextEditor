@@ -25,10 +25,6 @@ editorScroll (void)
 	FRAME->rx = 0; /* TODO: understand what this does.
 	FIXES: When scrolling to the end of a line, the cursor moves to the next row even if no line is there */
 
-	/*
-	 * TODO: buffer the output of bufferRowCxToRx, very inefficent to call it every time the cursor moves
-	 *       Move to like bufferInsertChar
-	 */
 	if (FRAME->cy < BUFFER->numrows)
 	{
 		FRAME->rx = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
@@ -117,24 +113,25 @@ editorSetStatusMessage (const wchar_t *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	vswprintf(E.bar->statusmsg, sizeof(E.bar->statusmsg), fmt, ap);
+	vswprintf(E.mes->message, sizeof(E.mes->message), fmt, ap);
 	va_end(ap);
-	E.bar->statusmsg_time = time(NULL);
+	E.mes->messageTime = time(NULL);
 }
 
 void
 editorDrawMessageBar (void)
 {
 	int msglen;
-	msglen = wcslen(E.bar->statusmsg);
+	msglen = wcslen(E.mes->message);
 	if (msglen > FRAME->screencols)
 		msglen = FRAME->screencols;
 
-	if (msglen && time(NULL) - E.bar->statusmsg_time < 5)
+	if (msglen && time(NULL) - E.mes->messageTime < 5)
 	{
-		E.bar->statusmsgSize = msglen;
-		werase(E.bar->statusBarFrame);
-		waddwstr(E.bar->statusBarFrame, E.bar->statusmsg);
+		E.mes->messageLen = msglen;
+		werase(E.mes->messageBarFrame);
+		waddwstr(E.mes->messageBarFrame, E.mes->message);
+		wrefresh(E.mes->messageBarFrame);
 	}
 }
 

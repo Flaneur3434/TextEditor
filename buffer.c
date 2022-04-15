@@ -3,10 +3,6 @@
 extern editorConfig E;
 extern wchar_t *cwd;   /* current working directory of the program */
 
-/*
- * TODO: Cursor position doesnt reflect the rendered position
- */
-
 int
 bufferRowCxToRx (erow *row, int cx)
 {

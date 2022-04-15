@@ -20,6 +20,7 @@ editorRowsToString (int *buflen)
 
 	*buflen = totlen;
 	buf = (wchar_t *) malloc(totlen * sizeof(wchar_t));
+
 	p = buf;
 	for (int i = 0; i < BUFFER->numrows; i++)
 	{
@@ -29,6 +30,7 @@ editorRowsToString (int *buflen)
 		p++;
 	}
 
+	/* return the pointer to the start of the string buffer */
 	return buf;
 }
 
@@ -96,7 +98,9 @@ editorSave (void)
 	{
 		if (ftruncate(fd, len) != -1)
 		{
-			if (write(fd, buf, len) == len)
+			char *buf_char = wstos(buf, len);
+			len = strlen(buf_char);
+			if (write(fd, buf_char, len) == len)
 			{
 				close(fd);
 				free(buf);
