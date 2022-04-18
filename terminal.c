@@ -18,13 +18,13 @@ setupTerm (void)
 	/* to get ncurses rgb colors do: regular rgb * 1000 / 255 */
 	init_color(COLOR_BLACK, 0, 0, 0);
 	init_color(COLOR_WHITE, 670, 654, 639);
-	init_color(COLOR_CYAN,  0, 400, 1000);
+	init_color(COLOR_CYAN,  0, 313, 627);
 
 	if (has_colors())
 	{
 		/*                          foreground   background   */
-		init_pair(TEXTWINDOW_COLOR, COLOR_WHITE, COLOR_BLACK);
-		init_pair(STATUSBAR_COLOR,  COLOR_BLACK, COLOR_CYAN);
+		init_pair(TEXTWINDOW_COLOR, COLOR_WHITE, COLOR_CYAN);
+		init_pair(STATUSBAR_COLOR,  COLOR_CYAN, COLOR_WHITE);
 	}
 }
 

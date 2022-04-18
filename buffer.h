@@ -5,6 +5,7 @@ typedef struct flags flags;
 typedef struct erow erow;
 typedef struct textEditorBuffer textEditorBuffer;
 
+/* make this a union */
 struct flags {
 	unsigned int dirty : 1;
 	unsigned int mode : 2;

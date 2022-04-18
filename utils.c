@@ -1,5 +1,6 @@
 #include "marisa.h"
 
+extern editorConfig E;
 wchar_t *
 stows (const char *s, size_t n)
 {
@@ -63,4 +64,87 @@ cursor_set_color_rgb (unsigned char red, unsigned char green, unsigned char blue
 {
     printf("\e]12;#%.2x%.2x%.2x\a", red, green, blue);
     fflush(stdout);
+}
+
+void
+nextWord (erow *currentRow, int *cursorPos)
+{
+	for (int i = *cursorPos; i < currentRow->size; i++)
+	{
+		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
+		{
+			*cursorPos = i + 1;
+			return;
+		}
+	}
+	*cursorPos = currentRow->size;
+}
+
+void
+prevWord (erow *currentRow, int *cursorPos)
+{
+	for (int i = *cursorPos; i > 0; i--)
+	{
+		/* if cursor is at the end of the line */
+		if (i + 1 == currentRow->size)
+		{
+			while (isalpha(currentRow->chars[i - 1]))
+				i--;
+
+			*cursorPos = i;
+			return;
+		}
+
+		/* default */
+		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
+		{
+			while (isalpha(currentRow->chars[i - 1]))
+				i--;
+
+			*cursorPos = i;
+			return;
+		}
+	}
+	*cursorPos = 0;
+}
+
+void
+deleteNextWord (erow *currentRow, int *cursorPos)
+{
+	int i = *cursorPos;
+	while(i < currentRow->size)
+	{
+		if (iswspace(currentRow->chars[i]))
+		{
+			bufferRowDelChar(currentRow, i);
+			break;
+		}
+
+		bufferRowDelChar(currentRow, i);
+	}
+
+	*cursorPos = i;
+}
+
+void
+deletePrevWord (erow *currentRow, int *cursorPos)
+{
+	int i = *cursorPos;
+
+
+	while (i > 0)
+	{
+		if (i == currentRow->size)
+			i--;
+
+		if (iswspace(currentRow->chars[i]))
+		{
+			bufferRowDelChar(currentRow, i);
+			break;
+		}
+
+		bufferRowDelChar(currentRow, i);
+	}
+
+	*cursorPos = i;
 }
