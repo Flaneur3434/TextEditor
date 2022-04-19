@@ -66,6 +66,7 @@ cursor_set_color_rgb (unsigned char red, unsigned char green, unsigned char blue
     fflush(stdout);
 }
 
+/* end up on next word's last character */
 void
 nextWord (erow *currentRow, int *cursorPos)
 {
@@ -80,28 +81,23 @@ nextWord (erow *currentRow, int *cursorPos)
 	*cursorPos = currentRow->size;
 }
 
+/* end up on previous word's beginning character */
 void
 prevWord (erow *currentRow, int *cursorPos)
 {
-	for (int i = *cursorPos; i > 0; i--)
+	int i = *cursorPos;
+
+	/* skip space and punctuation, needed because we want to end up at the beginning on the previous word */
+	if (iswspace(currentRow->chars[i - 1]) || iswpunct(currentRow->chars[i - 1]))
 	{
-		/* if cursor is at the end of the line */
-		if (i + 1 == currentRow->size)
-		{
-			while (isalpha(currentRow->chars[i - 1]))
-				i--;
+		i -= 2;
+	}
 
-			*cursorPos = i;
-			return;
-		}
-
-		/* default */
+	for (; i > 0; i--)
+	{
 		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
 		{
-			while (isalpha(currentRow->chars[i - 1]))
-				i--;
-
-			*cursorPos = i;
+			*cursorPos = i + 1;
 			return;
 		}
 	}
@@ -114,7 +110,7 @@ deleteNextWord (erow *currentRow, int *cursorPos)
 	int i = *cursorPos;
 	while(i < currentRow->size)
 	{
-		if (iswspace(currentRow->chars[i]))
+		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
 		{
 			bufferRowDelChar(currentRow, i);
 			break;
@@ -137,7 +133,7 @@ deletePrevWord (erow *currentRow, int *cursorPos)
 		if (i == currentRow->size)
 			i--;
 
-		if (iswspace(currentRow->chars[i]))
+		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
 		{
 			bufferRowDelChar(currentRow, i);
 			break;

@@ -35,10 +35,6 @@ main (int argc,  char *argv[])
 
 /*
  * TODO: editor message wont disappear after 3 secs
- * Normal Mode Keybinds:
- *          Ctrl + (Left | Right)         => move a word left or right
- *          Ctrl + Shift + (Left | Right) => Mark a word left or right
- *          Alt + d                       => delete a word
  *
  * 1. regex searching
  * 2. Undo Redo

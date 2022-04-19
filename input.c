@@ -177,16 +177,16 @@ editorProcessKeypressVisual (void)
 		editorMoveCursor(KEY_RIGHT);
 		break;
 	case 'o':
-		nextWord(BUFFER->row, &(FRAME->cx));
+		nextWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
 		break;
 	case 'u':
-		prevWord(BUFFER->row, &(FRAME->cx));
+		prevWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
 		break;
 	case 'e':
-		deletePrevWord(BUFFER->row, &(FRAME->cx));
+		deletePrevWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
 		break;
 	case 'r':
-		deleteNextWord(BUFFER->row, &(FRAME->cx));
+		deleteNextWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
 		break;
 	case ' ':
 		readSpaceMap();
