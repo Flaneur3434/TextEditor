@@ -6,6 +6,7 @@ typedef struct erow erow;
 typedef struct state state;
 typedef struct stateStack stateStack;
 typedef struct textEditorBuffer textEditorBuffer;
+typedef enum operation operation;
 
 enum operation {DELETE, INSERT};
 
@@ -33,7 +34,7 @@ struct state {
 	char *text;            /* the text that was either inserted or deleted */
 	operation op;          /* either DELETE or INSERT */
 	textEditorBuffer *buffer;
-}
+};
 
 /*
  * will have at most 2 pointers pointing to it

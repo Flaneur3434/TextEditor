@@ -70,6 +70,12 @@ cursor_set_color_rgb (unsigned char red, unsigned char green, unsigned char blue
 void
 nextWord (erow *currentRow, int *cursorPos)
 {
+	if (*cursorPos == currentRow->size)
+	{
+		editorMoveCursor(KEY_RIGHT);
+		return;
+	}
+
 	for (int i = *cursorPos; i < currentRow->size; i++)
 	{
 		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
@@ -85,15 +91,19 @@ nextWord (erow *currentRow, int *cursorPos)
 void
 prevWord (erow *currentRow, int *cursorPos)
 {
-	int i = *cursorPos;
-
-	/* skip space and punctuation, needed because we want to end up at the beginning on the previous word */
-	if (iswspace(currentRow->chars[i - 1]) || iswpunct(currentRow->chars[i - 1]))
+	if (*cursorPos == 0)
 	{
-		i -= 2;
+		editorMoveCursor(KEY_LEFT);
+		return;
 	}
 
-	for (; i > 0; i--)
+	/* skip space and punctuation, needed because we want to end up at the beginning on the previous word */
+	if (iswspace(currentRow->chars[*cursorPos - 1]) || iswpunct(currentRow->chars[*cursorPos - 1]))
+	{
+		*cursorPos -= 2;
+	}
+
+	for (int i = *cursorPos; i > 0; i--)
 	{
 		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
 		{
