@@ -76,11 +76,20 @@ nextWord (erow *currentRow, int *cursorPos)
 		return;
 	}
 
+	/* skip consecutive whitescpace */
+	while (iswspace(currentRow->chars[*cursorPos + 1]) || iswpunct(currentRow->chars[*cursorPos + 1]))
+	{
+		*cursorPos += 1;
+	}
+
+	/* move to beginning on the word */
+	*cursorPos += 1;
+
 	for (int i = *cursorPos; i < currentRow->size; i++)
 	{
 		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
 		{
-			*cursorPos = i + 1;
+			*cursorPos = i;
 			return;
 		}
 	}
@@ -98,10 +107,13 @@ prevWord (erow *currentRow, int *cursorPos)
 	}
 
 	/* skip space and punctuation, needed because we want to end up at the beginning on the previous word */
-	if (iswspace(currentRow->chars[*cursorPos - 1]) || iswpunct(currentRow->chars[*cursorPos - 1]))
+	while (iswspace(currentRow->chars[*cursorPos - 1]) || iswpunct(currentRow->chars[*cursorPos - 1]))
 	{
-		*cursorPos -= 2;
+		*cursorPos -= 1;
 	}
+
+	/* move to ending of the word */
+	*cursorPos -= 1;
 
 	for (int i = *cursorPos; i > 0; i--)
 	{
@@ -117,7 +129,21 @@ prevWord (erow *currentRow, int *cursorPos)
 void
 deleteNextWord (erow *currentRow, int *cursorPos)
 {
-	int i = *cursorPos;
+	int i = *cursorPos > 0 ? *cursorPos : 0;
+
+	if (i == currentRow->size)
+	{
+		editorMoveCursor(KEY_RIGHT);
+		editorDelChar();
+		return;
+	}
+
+	/* delete consecutive whitescpace */
+	while (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
+	{
+		bufferRowDelChar(currentRow, i);
+	}
+
 	while(i < currentRow->size)
 	{
 		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
@@ -135,10 +161,15 @@ deleteNextWord (erow *currentRow, int *cursorPos)
 void
 deletePrevWord (erow *currentRow, int *cursorPos)
 {
-	int i = *cursorPos;
+	int i = *cursorPos > 0 ? *cursorPos : 0;
 
+	if (i == 0)
+	{
+		editorDelChar();
+		return;
+	}
 
-	while (i > 0)
+	while (i > 1)
 	{
 		if (i == currentRow->size)
 			i--;
@@ -150,6 +181,15 @@ deletePrevWord (erow *currentRow, int *cursorPos)
 		}
 
 		bufferRowDelChar(currentRow, i);
+	}
+
+	if (i == currentRow->size)
+		i--;
+
+	/* delete consecutive whitescpace */
+	while (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
+	{
+		bufferRowDelChar(currentRow, i--);
 	}
 
 	*cursorPos = i;

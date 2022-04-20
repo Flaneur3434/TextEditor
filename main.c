@@ -36,7 +36,6 @@ main (int argc,  char *argv[])
 /*
  * TODO: editor message wont disappear after 3 secs
  * TODO: Visual mode transition handled by pressing 'HOME', insert mode transition by pressing 'SPC SPC'
- * TODO: forward word and backward word need to skip consecutive spaces
  * TODO: redo and undo
  */
 
