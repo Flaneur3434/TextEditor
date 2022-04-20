@@ -35,13 +35,15 @@ main (int argc,  char *argv[])
 
 /*
  * TODO: editor message wont disappear after 3 secs
- *
- * 1. regex searching
- * 2. Undo Redo
- * 3. Copy Passting
- * 4. Multiple Buffers
- * 5. Module Editing
- * 6. Multiple Windows (frames) https://www.viget.com/articles/c-games-in-ncurses-using-multiple-windows/
+ * TODO: Visual mode transition handled by pressing 'HOME', insert mode transition by pressing 'SPC SPC'
+ * TODO: redo and undo
+ */
+
+/*
+ * How does undo and redo work?
+ * pressing 'y' in visual mode will undo state until a different command is issued
+ * pressing 'y' again will redo state until a different command is issued
+ * state stack is cleaned after a save
  */
 
 /*

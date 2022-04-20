@@ -118,6 +118,7 @@ bufferRowAppendString (erow *row, wchar_t *s, size_t len)
 	BUFFER->flags.dirty = DIRTY;
 }
 
+/* TODO: make a bufferRowDelRegion */
 void
 bufferRowDelChar (erow *row, int at)
 {

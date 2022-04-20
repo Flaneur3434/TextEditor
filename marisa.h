@@ -51,6 +51,7 @@ typedef struct statusBar statusBar;
 typedef struct messageBar messageBar;
 typedef struct popupFrame popupFrame;
 
+
 /* TODO: rename these */
 struct statusBar {
 	WINDOW *statusBarFrame;
@@ -78,7 +79,6 @@ struct editorConfig {
 	messageBar *mes;
 	int numOfFrames;           /* number of frames starting from 0 */
 	int numOfBuffer;           /* number of frames starting from 0 */
-
 };
 
 #define FRAME E.currentFrame
