@@ -87,6 +87,7 @@ struct editorConfig {
 void editorInsertChar (int);
 void editorInsertNewline (void);
 void editorDelChar (void);
+void editorMarkRegion (void);
 
 wchar_t *editorRowsToString (int *);
 void editorOpen (char *);
@@ -98,6 +99,7 @@ char *editorPrompt (wchar_t *);
 void editorProcessKeypressNormal (void);
 void editorProcessKeypressVisual (void);
 void editorMoveCursor (int);
+void editorProcessKeypressMark (wint_t);
 
 void switchModes (void);
 

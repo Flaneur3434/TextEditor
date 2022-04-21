@@ -58,6 +58,7 @@ void bufferFreeRow (erow *);
 void bufferDelRow (int);
 void bufferRowInsertChar (erow *, int, int);
 void bufferRowAppendString (erow *, wchar_t *, size_t);
+void bufferDelRegion (int, int, int, int);
 void bufferRowDelChar (erow *, int);
 void killBuffer (textEditorBuffer *);                                       /* TODO */
 void readOnlyToggle (void);                                                 /* TODO */

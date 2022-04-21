@@ -88,6 +88,7 @@ drawWelcome (void)
 	wprintw(FRAME->frame, "%s", welcome);
 }
 
+/* TODO: status bar is not complete, some how need to show all of the modes */
 void
 editorDrawStatusBar (void)
 {

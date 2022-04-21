@@ -118,7 +118,35 @@ bufferRowAppendString (erow *row, wchar_t *s, size_t len)
 	BUFFER->flags.dirty = DIRTY;
 }
 
-/* TODO: make a bufferRowDelRegion */
+/* TODO; without bound checking, it segfaults */
+void
+bufferDelRegion (int begY, int begX, int endY, int endX)
+{
+	int minRow = begY < endY ? begY : endY;
+	int maxRow = begY > endY ? begY : endY;
+	int minCol = begY < endY ? begX : endX;
+	int maxCol = begY > endY ? begX : endX;
+
+	/* first row in a multirow region */
+	int regionColEnd = minRow == maxRow ? maxCol : BUFFER->row[minRow].size;
+	wmemmove(&BUFFER->row[minRow].chars[minCol],
+	    &BUFFER->row[minRow].chars[regionColEnd], regionColEnd - minCol);
+	BUFFER->row[minRow].size -= regionColEnd - minCol;
+	bufferUpdateRow(&BUFFER->row[minRow]);
+
+	/* Inbetween rows in a multirow region */
+	for (int i = minRow + 1; i < maxRow; i++)
+	{
+		bufferDelRow(i);
+	}
+
+	/* Last row in a multirow region */
+	wmemmove(&BUFFER->row[maxRow].chars[0],
+	    &BUFFER->row[maxRow].chars[maxCol], maxCol);
+	BUFFER->row[maxRow].size -= maxCol;
+	bufferUpdateRow(&BUFFER->row[maxRow]);
+}
+
 void
 bufferRowDelChar (erow *row, int at)
 {
@@ -127,7 +155,7 @@ bufferRowDelChar (erow *row, int at)
 
 	wmemmove(&row->chars[at], &row->chars[at + 1], row->size - at);
 	row->size--;
-	bufferUpdateRow (row);
+	bufferUpdateRow(row);
 	BUFFER->flags.dirty = DIRTY;
 }
 

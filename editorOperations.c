@@ -55,3 +55,27 @@ editorDelChar (void)
 	    FRAME->cy--;
 	}
 }
+
+/* TODO: broken, highlight skips over whitespace, ect. */
+void
+editorMarkRegion (void)
+{
+	/* int begY = FRAME->cy; */
+	/* int begX = FRAME->cx; */
+
+	editorSetStatusMessage(L"Marking time");
+	/* the first character needs to be marked out side of loop */
+	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
+	mvwchgat(FRAME->frame, FRAME->cy, renderCol, 1, A_BOLD | A_REVERSE, STATUSBAR_COLOR, NULL);
+
+	wint_t c;
+	while ((wget_wch(FRAME->frame, &c) != ERR) && (c != CTRL_KEY('q')))
+	{
+		editorProcessKeypressMark(c);
+		renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
+		mvwchgat(FRAME->frame, FRAME->cy, renderCol, 1, A_BOLD | A_REVERSE, STATUSBAR_COLOR, NULL);
+		wrefresh(FRAME->frame);
+	}
+
+	editorSetStatusMessage(L"Marking time done");
+}
