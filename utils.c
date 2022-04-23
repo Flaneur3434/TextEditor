@@ -183,40 +183,12 @@ deleteNextWord (void)
 void
 deletePrevWord (void)
 {
-	/* using variables because easier to type */
-	erow *currentRow = &(BUFFER->row[FRAME->cy]);
-	int cx = FRAME->cx;
-
-	int i = cx > 0 ? cx : 0;
-
-	if (i == 0)
+	if (FRAME->cx == 0)
 	{
 		editorDelChar();
 		return;
 	}
 
-	while (i > 1)
-	{
-		if (i == currentRow->size)
-			i--;
-
-		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
-		{
-			bufferRowDelChar(currentRow, i);
-			break;
-		}
-
-		bufferRowDelChar(currentRow, i);
-	}
-
-	if (i == currentRow->size)
-		i--;
-
-	/* delete consecutive whitescpace */
-	while (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
-	{
-		bufferRowDelChar(currentRow, i--);
-	}
-
-	FRAME->cx = i;
+	prevWord();
+	deleteNextWord();
 }

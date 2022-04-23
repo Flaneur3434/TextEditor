@@ -61,8 +61,7 @@ editorDelChar (void)
 	}
 }
 
-/* TODO: VERY BUGGY */
-/* TODO: can't move up and down */
+/* TODO: cursor disappears */
 /* TODO: highlight does not work well with wide characters */
 void
 editorMarkRegion (void)
@@ -74,7 +73,8 @@ editorMarkRegion (void)
 	editorDrawMessageBar();
 
 	/* the first character needs to be processed out of the loop */
-	mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx, 1, A_BOLD | A_REVERSE, STATUSBAR_COLOR, NULL);
+	/* this is a bug */
+	mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
 	wint_t c;
 	while ((wget_wch(FRAME->frame, &c) != ERR) && (c != CTRL_KEY('q')))
@@ -88,18 +88,19 @@ editorMarkRegion (void)
 		case L'o':
 		case L'l':
 		case L';':
-			if ((startX < anchorX && startY == anchorY) || (startX > anchorX && startY < anchorY))
-				unMarkRegionForward(startX);
-			else
+			/* TODO: Fix conditions */
+			if ((startX >= anchorX && startY > anchorY) || (startX <= anchorX && startY >= anchorY))
 				markRegionForward(startX);
+			else
+				unMarkRegionForward(startX);
 			break;
 		case L'u':
 		case L'j':
 		case L'h':
-			if ((startX > anchorX && startY == anchorY) || (startX < anchorX && startY > anchorY))
-				unMarkRegionBackwards(startX);
-			else
+			if ((startX <= anchorX && startY < anchorY) || (startX >= anchorX && startY <= anchorY))
 				markRegionBackwards(startX);
+			else
+				unMarkRegionBackwards(startX);
 			break;
 		}
 
@@ -111,11 +112,6 @@ editorMarkRegion (void)
 	editorDrawMessageBar();
 }
 
-/*
- * when you are moving forwards, and your startX is less than anchorX when startY is equal to anchorY
- * OR startX is greater than anchorX when startY is less than anchorY, then unmark region
- * Else mark region
- */
 static void
 markRegionForward (int startX)
 {
@@ -124,7 +120,7 @@ markRegionForward (int startX)
 			mvwchgat(FRAME->frame, FRAME->cy, startX + i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
 	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
-	for (int i = 1; i <= renderCol - FRAME->cx; i++)
+	for (int i = 0; i <= renderCol - FRAME->cx; i++)
 		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx + i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 }
 
@@ -136,15 +132,10 @@ unMarkRegionForward (int startX)
 			mvwchgat(FRAME->frame, FRAME->cy, startX + i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
 
 	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
-	for (int i = 1; i <= renderCol - FRAME->cx; i++)
+	for (int i = 0; i <= renderCol - FRAME->cx; i++)
 		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx + i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
 }
 
-/*
- * when you are moving backwards, and your startX is greater than anchorX when startY is equal to anchorY
- * OR startX is less than anchorX when startY is greater than anchorY, then unmark region
- * Else mark region
- */
 static void
 markRegionBackwards (int startX)
 {
@@ -154,7 +145,7 @@ markRegionBackwards (int startX)
 
 	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
 	for (int i = 0; i <= renderCol - FRAME->cx; i++)
-		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cy - i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx - i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 }
 
 static void
@@ -166,5 +157,5 @@ unMarkRegionBackwards (int startX)
 
 	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
 	for (int i = 0; i <= renderCol - FRAME->cx; i++)
-		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cy - i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
+		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx - i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
 }
