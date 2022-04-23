@@ -11,9 +11,9 @@ wchar_t *stows (const char *s, size_t n);
 char *wstos (const wchar_t *s, size_t n);
 const char *trimleft (const char *s);
 void cursor_set_color_rgb (unsigned char, unsigned char, unsigned char);
-void nextWord (erow *, int *);
-void prevWord (erow *, int *);
-void deleteNextWord (erow *, int *);
-void deletePrevWord (erow *, int *);
+void nextWord (void);
+void prevWord (void);
+void deleteNextWord (void);
+void deletePrevWord (void);
 
 #endif /* MARISA_UTILS header guard */

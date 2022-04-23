@@ -177,16 +177,16 @@ editorProcessKeypressVisual (void)
 		editorMoveCursor(KEY_RIGHT);
 		break;
 	case 'o':
-		nextWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
+		nextWord();
 		break;
 	case 'u':
-		prevWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
+		prevWord();
 		break;
 	case 'e':
-		deletePrevWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
+		deletePrevWord();
 		break;
 	case 'r':
-		deleteNextWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
+		deleteNextWord();
 		break;
 	case 't':
 		editorMarkRegion();
@@ -285,10 +285,10 @@ editorProcessKeypressMark (wint_t c)
 		editorMoveCursor(KEY_RIGHT);
 		break;
 	case 'o':
-		nextWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
+		nextWord();
 		break;
 	case 'u':
-		prevWord(&(BUFFER->row[FRAME->cy]), &(FRAME->cx));
+		prevWord();
 		break;
 	}
 }

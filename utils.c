@@ -68,68 +68,90 @@ cursor_set_color_rgb (unsigned char red, unsigned char green, unsigned char blue
 
 /* end up on next word's last character */
 void
-nextWord (erow *currentRow, int *cursorPos)
+nextWord (void)
 {
-	if (*cursorPos == currentRow->size)
+	/* using variables because easier to type */
+	erow *currentRow = &(BUFFER->row[FRAME->cy]);
+	int cx = FRAME->cx;
+	int cy = FRAME->cy;
+
+	/* bound checking */
+	if (cy == BUFFER->numrows)
+	{
+		return;
+	}
+	else if (cx == currentRow->size)
 	{
 		editorMoveCursor(KEY_RIGHT);
 		return;
 	}
 
 	/* skip consecutive whitescpace */
-	while (iswspace(currentRow->chars[*cursorPos + 1]) || iswpunct(currentRow->chars[*cursorPos + 1]))
+	while (cx + 1 < currentRow->size &&
+	    (iswspace(currentRow->chars[cx + 1]) || iswpunct(currentRow->chars[cx + 1])))
 	{
-		*cursorPos += 1;
+		cx += 1;
 	}
 
 	/* move to beginning on the word */
-	*cursorPos += 1;
+	cx += 1;
 
-	for (int i = *cursorPos; i < currentRow->size; i++)
+	for (int i = cx; i < currentRow->size; i++)
 	{
 		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
 		{
-			*cursorPos = i;
+			FRAME->cx = i - 1;
 			return;
 		}
 	}
-	*cursorPos = currentRow->size;
+
+	FRAME->cx = currentRow->size;
 }
 
 /* end up on previous word's beginning character */
 void
-prevWord (erow *currentRow, int *cursorPos)
+prevWord (void)
 {
-	if (*cursorPos == 0)
+	/* using variables because easier to type */
+	erow *currentRow = &(BUFFER->row[FRAME->cy]);
+	int cx = FRAME->cx;
+
+	/* bound checking */
+	if (cx == 0)
 	{
 		editorMoveCursor(KEY_LEFT);
 		return;
 	}
 
 	/* skip space and punctuation, needed because we want to end up at the beginning on the previous word */
-	while (iswspace(currentRow->chars[*cursorPos - 1]) || iswpunct(currentRow->chars[*cursorPos - 1]))
+	while (--cx != 0 &&
+	    (iswspace(currentRow->chars[cx - 1]) || iswpunct(currentRow->chars[cx - 1])))
 	{
-		*cursorPos -= 1;
+		cx -= 1;
 	}
 
 	/* move to ending of the word */
-	*cursorPos -= 1;
+	cx -= 1;
 
-	for (int i = *cursorPos; i > 0; i--)
+	for (int i = cx; i > 0; i--)
 	{
 		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
 		{
-			*cursorPos = i + 1;
+			FRAME->cx = i + 1;
 			return;
 		}
 	}
-	*cursorPos = 0;
+	FRAME->cx = 0;
 }
 
 void
-deleteNextWord (erow *currentRow, int *cursorPos)
+deleteNextWord (void)
 {
-	int i = *cursorPos > 0 ? *cursorPos : 0;
+	/* using variables because easier to type */
+	erow *currentRow = &(BUFFER->row[FRAME->cy]);
+	int cx = FRAME->cx;
+
+	int i = cx > 0 ? cx : 0;
 
 	if (i == currentRow->size)
 	{
@@ -155,13 +177,17 @@ deleteNextWord (erow *currentRow, int *cursorPos)
 		bufferRowDelChar(currentRow, i);
 	}
 
-	*cursorPos = i;
+	FRAME->cx = i;
 }
 
 void
-deletePrevWord (erow *currentRow, int *cursorPos)
+deletePrevWord (void)
 {
-	int i = *cursorPos > 0 ? *cursorPos : 0;
+	/* using variables because easier to type */
+	erow *currentRow = &(BUFFER->row[FRAME->cy]);
+	int cx = FRAME->cx;
+
+	int i = cx > 0 ? cx : 0;
 
 	if (i == 0)
 	{
@@ -192,5 +218,5 @@ deletePrevWord (erow *currentRow, int *cursorPos)
 		bufferRowDelChar(currentRow, i--);
 	}
 
-	*cursorPos = i;
+	FRAME->cx = i;
 }
