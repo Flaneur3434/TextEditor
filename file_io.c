@@ -82,7 +82,8 @@ editorSave (void)
 	if (BUFFER->filename == NULL)
 		BUFFER->filename = editorPrompt(L"Save as: %s");
 
-	if (BUFFER->filename == NULL) {
+	if (BUFFER->filename == NULL)
+	{
 		editorSetStatusMessage(L"Save aborted");
 		return;
 	}
@@ -94,24 +95,32 @@ editorSave (void)
 		return;
 	}
 
-	if ((fd = open(BUFFER->filename, O_RDWR | O_CREAT, 0644)) != -1)
+	if ((fd = open(BUFFER->filename, O_RDWR | O_CREAT, 0644)) == -1)
 	{
-		if (ftruncate(fd, len) != -1)
-		{
-			char *buf_char = wstos(buf, len);
-			len = strlen(buf_char);
-			if (write(fd, buf_char, len) == len)
-			{
-				close(fd);
-				free(buf);
-				BUFFER->flags.dirty = CLEAN;
-				editorSetStatusMessage(L"%d bytes written to disk", len);
-				return;
-			}
-		}
+		free(buf);
+		editorSetStatusMessage(L"Can't save! I/O error: %s", strerror(errno));
+	}
+	else if (ftruncate(fd, len) == -1)
+	{
 		close(fd);
+		free(buf);
+		editorSetStatusMessage(L"Can't save! I/O error: %s", strerror(errno));
 	}
 
-	free(buf);
-	editorSetStatusMessage(L"Can't save! I/O error: %s", strerror(errno));
+	char *buf_char = wstos(buf, len);
+	len = strlen(buf_char);
+	if (write(fd, buf_char, len) == len)
+	{
+		close(fd);
+		free(buf);
+		BUFFER->flags.dirty = CLEAN;
+		editorSetStatusMessage(L"%d bytes written to disk", len);
+		return;
+	}
+	else
+	{
+		close(fd);
+		free(buf);
+		editorSetStatusMessage(L"Can't save! I/O error: %s", strerror(errno));
+	}
 }
