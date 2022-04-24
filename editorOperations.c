@@ -72,24 +72,19 @@ editorMarkRegion (void)
 	editorSetStatusMessage(L"Marking time");
 	editorDrawMessageBar();
 
-	/* the first character needs to be processed out of the loop */
-	/* this is a bug */
-	mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
-
 	wint_t c;
 	while ((wget_wch(FRAME->frame, &c) != ERR) && (c != CTRL_KEY('q')))
 	{
 		int startY = FRAME->cy;
 		int startX = FRAME->cx;
 		editorProcessKeypressMark(c);
-		fprintf(stderr, "%lc was pressed, moving to y:%d, x:%d\n", c, FRAME->cy, FRAME->cx);
 		switch (c)
 		{
 		case L'o':
 		case L'l':
 		case L';':
 			/* TODO: Fix conditions */
-			if ((startX >= anchorX && startY > anchorY) || (startX <= anchorX && startY >= anchorY))
+			if ((startX >= anchorX && startY >= anchorY) || (startX <= anchorX && startY > anchorY))
 				markRegionForward(startX);
 			else
 				unMarkRegionForward(startX);
@@ -97,7 +92,7 @@ editorMarkRegion (void)
 		case L'u':
 		case L'j':
 		case L'h':
-			if ((startX <= anchorX && startY < anchorY) || (startX >= anchorX && startY <= anchorY))
+			if ((startX <= anchorX && startY <= anchorY) || (startX >= anchorX && startY < anchorY))
 				markRegionBackwards(startX);
 			else
 				unMarkRegionBackwards(startX);
@@ -116,7 +111,7 @@ static void
 markRegionForward (int startX)
 {
 	if (FRAME->cx - startX > 1)
-		for (int i = 1; i <= FRAME->cx - startX; i++)
+		for (int i = 0; i <= FRAME->cx - startX; i++)
 			mvwchgat(FRAME->frame, FRAME->cy, startX + i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
 	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
@@ -128,7 +123,7 @@ static void
 unMarkRegionForward (int startX)
 {
 	if (FRAME->cx - startX > 1)
-		for (int i = 1; i <= FRAME->cx - startX; i++)
+		for (int i = 0; i <= FRAME->cx - startX; i++)
 			mvwchgat(FRAME->frame, FRAME->cy, startX + i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
 
 	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
