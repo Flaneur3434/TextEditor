@@ -120,17 +120,22 @@ bufferRowAppendString (erow *row, wchar_t *s, size_t len)
 
 /* TODO; without bound checking, it segfaults */
 void
-bufferDelRegion (int begY, int begX, int endY, int endX)
+bufferDelRegion (void)
 {
-	int minRow = begY < endY ? begY : endY;
-	int maxRow = begY > endY ? begY : endY;
-	int minCol = begY < endY ? begX : endX;
-	int maxCol = begY > endY ? begX : endX;
+#define region E.regionMarked
+
+	/* region[4] = {begY, begX, endY, endX} */
+	int minRow = region[0] <= region[2] ? region[0] : region[2];
+	int minCol = region[0] <= region[2] ? region[1] : region[3];
+	int maxRow = region[0] > region[2] ? region[0] : region[2];
+	int maxCol = region[0] > region[2] ? region[1] : region[3];
+
+#undef region
 
 	/* first row in a multirow region */
 	int regionColEnd = minRow == maxRow ? maxCol : BUFFER->row[minRow].size;
 	wmemmove(&BUFFER->row[minRow].chars[minCol],
-	    &BUFFER->row[minRow].chars[regionColEnd], regionColEnd - minCol);
+	    &BUFFER->row[maxRow].chars[regionColEnd - 1], regionColEnd - minCol);
 	BUFFER->row[minRow].size -= regionColEnd - minCol;
 	bufferUpdateRow(&BUFFER->row[minRow]);
 
@@ -141,10 +146,13 @@ bufferDelRegion (int begY, int begX, int endY, int endX)
 	}
 
 	/* Last row in a multirow region */
-	wmemmove(&BUFFER->row[maxRow].chars[0],
-	    &BUFFER->row[maxRow].chars[maxCol], maxCol);
-	BUFFER->row[maxRow].size -= maxCol;
-	bufferUpdateRow(&BUFFER->row[maxRow]);
+	if (minRow != maxRow)
+	{
+		wmemmove(&BUFFER->row[maxRow].chars[0],
+		    &BUFFER->row[maxRow].chars[maxCol], maxCol);
+		BUFFER->row[maxRow].size -= maxCol;
+		bufferUpdateRow(&BUFFER->row[maxRow]);
+	}
 }
 
 void

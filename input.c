@@ -188,6 +188,9 @@ editorProcessKeypressVisual (void)
 	case 'r':
 		deleteNextWord();
 		break;
+	case 'x':
+		bufferDelRow(FRAME->cy);
+		break;
 	case 't':
 		editorMarkRegion();
 		break;
@@ -199,6 +202,56 @@ editorProcessKeypressVisual (void)
 		break;
 	case '.':
 		/* TODO: Call switchBuffer */
+		break;
+	}
+}
+
+void
+editorProcessKeypressMark (wint_t c)
+{
+	switch (c)
+	{
+	case KEY_UP:
+	case KEY_DOWN:
+	case KEY_LEFT:
+	case KEY_RIGHT:
+		editorMoveCursor(c);
+		break;
+	case 'h':
+		FRAME->cx = 0;
+		break;
+	case ';':
+		if (FRAME->cy < BUFFER->numrows)
+			FRAME->cx = BUFFER->row[FRAME->cy].size;
+		break;
+	case 'i':
+		editorMoveCursor(KEY_UP);
+		break;
+	case 'k':
+		editorMoveCursor(KEY_DOWN);
+		break;
+	case 'j':
+		editorMoveCursor(KEY_LEFT);
+		break;
+	case 'l':
+		editorMoveCursor(KEY_RIGHT);
+		break;
+	case 'o':
+		nextWord();
+		break;
+	case 'u':
+		prevWord();
+		break;
+	}
+}
+
+void
+editorProcessMarkActions (wint_t c)
+{
+	switch (c)
+	{
+	case 'd':
+		bufferDelRegion();
 		break;
 	}
 }
@@ -251,38 +304,5 @@ editorMoveCursor (int key)
 	if (FRAME->cx > rowlen)
 	{
 		FRAME->cx = rowlen;
-	}
-}
-
-void
-editorProcessKeypressMark (wint_t c)
-{
-	switch (c)
-	{
-	case KEY_UP:
-	case KEY_DOWN:
-	case KEY_LEFT:
-	case KEY_RIGHT:
-		editorMoveCursor(c);
-		break;
-	case 'h':
-		FRAME->cx = 0;
-		break;
-	case ';':
-		if (FRAME->cy < BUFFER->numrows)
-			FRAME->cx = BUFFER->row[FRAME->cy].size;
-		break;
-	case 'j':
-		editorMoveCursor(KEY_LEFT);
-		break;
-	case 'l':
-		editorMoveCursor(KEY_RIGHT);
-		break;
-	case 'o':
-		nextWord();
-		break;
-	case 'u':
-		prevWord();
-		break;
 	}
 }

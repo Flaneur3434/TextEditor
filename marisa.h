@@ -80,6 +80,7 @@ struct editorConfig {
 	messageBar *mes;
 	int numOfFrames;           /* number of frames starting from 0 */
 	int numOfBuffer;           /* number of frames starting from 0 */
+	int regionMarked[4];       /* coordinates of marked region */
 };
 
 #define FRAME E.currentFrame
@@ -101,6 +102,7 @@ void editorProcessKeypressNormal (void);
 void editorProcessKeypressVisual (void);
 void editorMoveCursor (int);
 void editorProcessKeypressMark (wint_t);
+void editorProcessMarkActions (wint_t);
 
 void switchModes (void);
 

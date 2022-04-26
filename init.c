@@ -35,6 +35,10 @@ initEditor (editorConfig *E)
 
 	E->numOfFrames = 0;
 	E->numOfBuffer = 0;
+	E->regionMarked[0] = 0;
+	E->regionMarked[1] = 0;
+	E->regionMarked[2] = 0;
+	E->regionMarked[3] = 0;
 
    	((frame *) g_ptr_array_index(E->frames, 0))->currentBuffer = (textEditorBuffer *) g_ptr_array_index(E->buffers, 0);
 }

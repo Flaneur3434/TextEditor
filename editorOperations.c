@@ -2,10 +2,10 @@
 
 extern editorConfig E;
 
-static void markRegionForward (int);
-static void unMarkRegionForward (int);
-static void markRegionBackwards (int);
-static void unMarkRegionBackwards (int);
+/* static void markRegionForward (int); */
+/* static void unMarkRegionForward (int); */
+/* static void markRegionBackwards (int); */
+/* static void unMarkRegionBackwards (int); */
 
 void
 editorInsertChar (int c)
@@ -63,102 +63,94 @@ editorDelChar (void)
 
 /* TODO: highlight does not work well with wide characters */
 /* TODO: Breaks when selection starts in the middle of a word */
+
+/*
+ * Every motion during mark-mode refreshes the screen with a section of the text highlighted
+ * Every motion produces a coordinate to anywhere on the screen
+ * We find the x-offset and y-offset of each action
+ * We need to keep track of the previous coordinates (in case we need to unmark)
+ * Once mark-mode is activated, we need to keep track of the anchors
+ *
+ *
+ * We need to do 2 passes on the screen
+ * 1. Refresh screen line by line from the top (0, 0)
+ * 2. Back from the top, top to the coordinate of the last mark command
+ *    Start moving character by character and mark the region until you get to the mark end coordinate
+ *
+ * No need for an unmark function because the screen gets refreshed every command
+ *
+ *
+ * Variables to keep track of:
+ * anchorX/Y: to know where mark-mode started. will ALWAYS be the beginning or end of a selection block
+ * prevX/Y: to know where the previous mark-mode move ended
+ * currX/Y: to know where the current mark-mode move will end
+ * Screen min-point / max-point: to know the minimum and maximum coordinates the user can mark without scrolling
+ */
+
 void
 editorMarkRegion (void)
 {
-	int anchorY = FRAME->cy;
-	int anchorX = FRAME->cx;
-
+	int anchorX = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx); int anchorY = FRAME->cy;
 	editorSetStatusMessage(L"Marking time");
-	editorDrawMessageBar();
-	wmove(FRAME->frame, anchorY, anchorX);
+        editorDrawMessageBar();
+        wmove(FRAME->frame, anchorY, anchorX);
 
-	wint_t c;
-	while ((wget_wch(FRAME->frame, &c) != ERR) && (c != CTRL_KEY('q')))
+        wint_t c;
+        while ((wget_wch(FRAME->frame, &c) != ERR) && (c != CTRL_KEY('q')))
 	{
-		/* int startY = FRAME->cy; */
-		int startX = FRAME->cx;
 		editorProcessKeypressMark(c);
+		editorRefreshScreen();
+		cursor_set_color_rgb(MARK_CURSOR);
 
-		switch (c)
+		int currX = 0, currY = 0;
+		getyx(FRAME->frame, currY, currX);
+
+		if (currY == anchorY)
 		{
-		case L'o':
-		case L'l':
-		case L';':
-			/* TODO: Fix conditions */
-			if ((FRAME->cx >= anchorX && FRAME->cy >= anchorY) || (FRAME->cx <= anchorX && FRAME->cy > anchorY))
-				markRegionForward(startX);
-			else
-				unMarkRegionForward(startX);
+			int beg = anchorX < currX ? anchorX : currX;
+			int end = currX > anchorX ? currX : anchorX;
+			for (int i = beg; i <= end; i++)
+				mvwchgat(FRAME->frame, anchorY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+		}
+		else if (currY > anchorY)
+		{
+			for (int i = anchorX; i < BUFFER->row[anchorY].rsize; i++)
+				mvwchgat(FRAME->frame, anchorY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
-			cursor_set_color_rgb(0, 102, 255);
-			break;
-		case L'u':
-		case L'j':
-		case L'h':
-			if ((FRAME->cx <= anchorX && FRAME->cy <= anchorY) || (FRAME->cx >= anchorX && FRAME->cy < anchorY))
-				markRegionBackwards(startX);
-			else
-				unMarkRegionBackwards(startX);
+			for (int i = anchorY + 1; i < currY; i++)
+				for (int j = 0; j < BUFFER->row[i].rsize; j++)
+					mvwchgat(FRAME->frame, i, j, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
-			cursor_set_color_rgb(MARK_CURSOR);
-			break;
+			for (int i = 0; i <= currX; i++)
+				mvwchgat(FRAME->frame, currY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+
+		}
+		else {
+			/* for some reason the cursor position is wrong, only in this block of code */
+			for (int i = anchorX; i >= 0; i--)
+				mvwchgat(FRAME->frame, anchorY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+
+			for (int i = currY + 1; i < anchorY; i++)
+				for (int j = 0; j < BUFFER->row[i].rsize; j++)
+					mvwchgat(FRAME->frame, i, j, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+
+			for (int i = currX; i <= BUFFER->row[currY].rsize; i++)
+				mvwchgat(FRAME->frame, currY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 		}
 
 		wrefresh(FRAME->frame);
 	}
 
-	editorSetStatusMessage(L"Marking time done");
-	FRAME->cy = anchorY; FRAME->cx = anchorX;
 	cursor_set_color_rgb(NORMAL_CURSOR);
+	editorSetStatusMessage(L"Marking time done");
 	editorDrawMessageBar();
-}
 
-static void
-markRegionForward (int startX)
-{
-	if (FRAME->cx - startX >= 1)
-		for (int i = 0; i <= FRAME->cx - startX; i++)
-			mvwchgat(FRAME->frame, FRAME->cy, startX + i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+	E.regionMarked[0] = anchorY;
+	E.regionMarked[1] = anchorX;
+	E.regionMarked[2] = FRAME->cy;
+	E.regionMarked[3] = FRAME->cx;
 
-	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
-	for (int i = 0; i < renderCol - FRAME->cx; i++)
-		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx + i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
-}
-
-static void
-unMarkRegionBackwards (int startX)
-{
-	if (startX - FRAME->cx >= 1)
-		for (int i = 0; i <= startX - FRAME->cx; i++)
-			mvwchgat(FRAME->frame, FRAME->cy, startX - i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
-
-	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
-	for (int i = 0; i <= renderCol - FRAME->cx; i++)
-		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx - i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
-}
-
-static void
-markRegionBackwards (int startX)
-{
-	if (startX - FRAME->cx >= 1)
-		for (int i = 0; i <= startX - FRAME->cx; i++)
-			mvwchgat(FRAME->frame, FRAME->cy, startX - i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
-
-	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
-	for (int i = 0; i <= renderCol - FRAME->cx; i++)
-		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx - i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
-}
-
-
-static void
-unMarkRegionForward (int startX)
-{
-	if (FRAME->cx - startX >= 1)
-		for (int i = 0; i <= FRAME->cx - startX; i++)
-			mvwchgat(FRAME->frame, FRAME->cy, startX + i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
-
-	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
-	for (int i = 0; i <= renderCol - FRAME->cx; i++)
-		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx + i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
+	/* TODO: this is terrible erognomics for the user */
+	if (wget_wch(FRAME->frame, &c) != ERR)
+		editorProcessMarkActions(c);
 }
