@@ -41,7 +41,8 @@
 #define MAP_KEY_LAYER_TWO 1
 #define CLEAN 0
 #define DIRTY 1
-#define BLURT fprintf(stderr, "%s:%d\tfunction %s %s\n", __FILE__, __LINE__, __func__, E->filename);
+#define NORMAL_CURSOR 171, 167, 163
+#define MARK_CURSOR 0, 102, 255
 #define SWITCH_MODE (E.currentFrame->currentBuffer->flags.mode = E.currentFrame->currentBuffer->flags.mode == NORMAL_MODE ? VISUAL_MODE : NORMAL_MODE)
 
 /*** data ***/

@@ -58,7 +58,7 @@ ${PROGRAM}: ${FILES.o}
 ${FILES.o}: ${FILES.h}
 
 # If it exists, prog1.dSYM is a directory on macOS
-DEBRIS = a.out core *~ *.dSYM *.su TAGS
+DEBRIS = a.out core *~ *.dSYM *.su TAGS log
 RM_FR  = rm -fr
 
 tags: ${FILES.c}

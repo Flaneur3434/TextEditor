@@ -61,8 +61,8 @@ editorDelChar (void)
 	}
 }
 
-/* TODO: cursor disappears */
 /* TODO: highlight does not work well with wide characters */
+/* TODO: Breaks when selection starts in the middle of a word */
 void
 editorMarkRegion (void)
 {
@@ -71,31 +71,37 @@ editorMarkRegion (void)
 
 	editorSetStatusMessage(L"Marking time");
 	editorDrawMessageBar();
+	wmove(FRAME->frame, anchorY, anchorX);
 
 	wint_t c;
 	while ((wget_wch(FRAME->frame, &c) != ERR) && (c != CTRL_KEY('q')))
 	{
-		int startY = FRAME->cy;
+		/* int startY = FRAME->cy; */
 		int startX = FRAME->cx;
 		editorProcessKeypressMark(c);
+
 		switch (c)
 		{
 		case L'o':
 		case L'l':
 		case L';':
 			/* TODO: Fix conditions */
-			if ((startX >= anchorX && startY >= anchorY) || (startX <= anchorX && startY > anchorY))
+			if ((FRAME->cx >= anchorX && FRAME->cy >= anchorY) || (FRAME->cx <= anchorX && FRAME->cy > anchorY))
 				markRegionForward(startX);
 			else
 				unMarkRegionForward(startX);
+
+			cursor_set_color_rgb(0, 102, 255);
 			break;
 		case L'u':
 		case L'j':
 		case L'h':
-			if ((startX <= anchorX && startY <= anchorY) || (startX >= anchorX && startY < anchorY))
+			if ((FRAME->cx <= anchorX && FRAME->cy <= anchorY) || (FRAME->cx >= anchorX && FRAME->cy < anchorY))
 				markRegionBackwards(startX);
 			else
 				unMarkRegionBackwards(startX);
+
+			cursor_set_color_rgb(MARK_CURSOR);
 			break;
 		}
 
@@ -104,37 +110,38 @@ editorMarkRegion (void)
 
 	editorSetStatusMessage(L"Marking time done");
 	FRAME->cy = anchorY; FRAME->cx = anchorX;
+	cursor_set_color_rgb(NORMAL_CURSOR);
 	editorDrawMessageBar();
 }
 
 static void
 markRegionForward (int startX)
 {
-	if (FRAME->cx - startX > 1)
+	if (FRAME->cx - startX >= 1)
 		for (int i = 0; i <= FRAME->cx - startX; i++)
 			mvwchgat(FRAME->frame, FRAME->cy, startX + i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
 	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
-	for (int i = 0; i <= renderCol - FRAME->cx; i++)
+	for (int i = 0; i < renderCol - FRAME->cx; i++)
 		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx + i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 }
 
 static void
-unMarkRegionForward (int startX)
+unMarkRegionBackwards (int startX)
 {
-	if (FRAME->cx - startX > 1)
-		for (int i = 0; i <= FRAME->cx - startX; i++)
-			mvwchgat(FRAME->frame, FRAME->cy, startX + i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
+	if (startX - FRAME->cx >= 1)
+		for (int i = 0; i <= startX - FRAME->cx; i++)
+			mvwchgat(FRAME->frame, FRAME->cy, startX - i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
 
 	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
 	for (int i = 0; i <= renderCol - FRAME->cx; i++)
-		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx + i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
+		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx - i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
 }
 
 static void
 markRegionBackwards (int startX)
 {
-	if (startX - FRAME->cx > 1)
+	if (startX - FRAME->cx >= 1)
 		for (int i = 0; i <= startX - FRAME->cx; i++)
 			mvwchgat(FRAME->frame, FRAME->cy, startX - i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
@@ -143,14 +150,15 @@ markRegionBackwards (int startX)
 		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx - i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 }
 
+
 static void
-unMarkRegionBackwards (int startX)
+unMarkRegionForward (int startX)
 {
-	if (startX - FRAME->cx > 1)
-		for (int i = 0; i <= startX - FRAME->cx; i++)
-			mvwchgat(FRAME->frame, FRAME->cy, startX - i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
+	if (FRAME->cx - startX >= 1)
+		for (int i = 0; i <= FRAME->cx - startX; i++)
+			mvwchgat(FRAME->frame, FRAME->cy, startX + i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
 
 	int renderCol = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
 	for (int i = 0; i <= renderCol - FRAME->cx; i++)
-		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx - i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
+		mvwchgat(FRAME->frame, FRAME->cy, FRAME->cx + i, 1, A_NORMAL, TEXTWINDOW_COLOR, NULL);
 }
