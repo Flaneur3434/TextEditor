@@ -90,52 +90,58 @@ editorDelChar (void)
 void
 editorMarkRegion (void)
 {
-	int anchorX = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx); int anchorY = FRAME->cy;
+	int anchorXFrame = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx)  - FRAME->coloff;
+	int anchorYFrame = FRAME->cy - FRAME->rowoff;
+
+	int anchorX = FRAME->cx;
+	int anchorY = FRAME->cy;
+
 	editorSetStatusMessage(L"Marking time");
         editorDrawMessageBar();
-        wmove(FRAME->frame, anchorY, anchorX);
+	cursor_set_color_rgb(MARK_CURSOR);
+	/* move back to the text window */
+        wmove(FRAME->frame, anchorYFrame, anchorXFrame);
 
         wint_t c;
         while ((wget_wch(FRAME->frame, &c) != ERR) && (c != CTRL_KEY('q')))
 	{
 		editorProcessKeypressMark(c);
 		editorRefreshScreen();
-		cursor_set_color_rgb(MARK_CURSOR);
 
 		int currX = 0, currY = 0;
 		getyx(FRAME->frame, currY, currX);
 
-		if (currY == anchorY)
+		if (currY == anchorYFrame)
 		{
-			int beg = anchorX < currX ? anchorX : currX;
-			int end = currX > anchorX ? currX : anchorX;
+			int beg = anchorXFrame < currX ? anchorXFrame: currX;
+			int end = currX > anchorXFrame ? currX : anchorXFrame;
 			for (int i = beg; i <= end; i++)
-				mvwchgat(FRAME->frame, anchorY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+				mvwchgat(FRAME->frame, anchorYFrame, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 		}
-		else if (currY > anchorY)
+		else if (currY > anchorYFrame)
 		{
-			for (int i = anchorX; i < BUFFER->row[anchorY].rsize; i++)
-				mvwchgat(FRAME->frame, anchorY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+			for (int i = anchorXFrame; i < BUFFER->row[anchorYFrame].rsize; i++)
+				mvwchgat(FRAME->frame, anchorYFrame, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
-			for (int i = anchorY + 1; i < currY; i++)
+			for (int i = anchorYFrame + 1; i < currY; i++)
 				for (int j = 0; j < BUFFER->row[i].rsize; j++)
-					mvwchgat(FRAME->frame, i, j, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+					mvwchgat(FRAME->frame, i, j - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
 			for (int i = 0; i <= currX; i++)
-				mvwchgat(FRAME->frame, currY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+				mvwchgat(FRAME->frame, currY, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
 		}
 		else {
 			/* for some reason the cursor position is wrong, only in this block of code */
-			for (int i = anchorX; i >= 0; i--)
-				mvwchgat(FRAME->frame, anchorY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+			for (int i = anchorXFrame; i >= 0; i--)
+				mvwchgat(FRAME->frame, anchorYFrame, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
-			for (int i = currY + 1; i < anchorY; i++)
+			for (int i = currY + 1; i < anchorYFrame; i++)
 				for (int j = 0; j < BUFFER->row[i].rsize; j++)
-					mvwchgat(FRAME->frame, i, j, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+					mvwchgat(FRAME->frame, i, j - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 
 			for (int i = currX; i <= BUFFER->row[currY].rsize; i++)
-				mvwchgat(FRAME->frame, currY, i, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+				mvwchgat(FRAME->frame, currY, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
 		}
 
 		wrefresh(FRAME->frame);

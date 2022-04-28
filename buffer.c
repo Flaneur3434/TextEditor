@@ -133,26 +133,32 @@ bufferDelRegion (void)
 #undef region
 
 	/* first row in a multirow region */
-	int regionColEnd = minRow == maxRow ? maxCol : BUFFER->row[minRow].size;
+	int firstRowColEnd = minRow == maxRow ? maxCol : BUFFER->row[minRow].size;
 	wmemmove(&BUFFER->row[minRow].chars[minCol],
-	    &BUFFER->row[maxRow].chars[regionColEnd - 1], regionColEnd - minCol);
-	BUFFER->row[minRow].size -= regionColEnd - minCol;
+	    &BUFFER->row[minRow].chars[firstRowColEnd], BUFFER->row[maxRow].size - firstRowColEnd);
+	BUFFER->row[minRow].size -= firstRowColEnd;
 	bufferUpdateRow(&BUFFER->row[minRow]);
+
+	if (BUFFER->row[minRow].size == 0)
+		bufferDelRow(minRow);
 
 	/* Inbetween rows in a multirow region */
 	for (int i = minRow + 1; i < maxRow; i++)
-	{
 		bufferDelRow(i);
-	}
 
 	/* Last row in a multirow region */
 	if (minRow != maxRow)
 	{
 		wmemmove(&BUFFER->row[maxRow].chars[0],
-		    &BUFFER->row[maxRow].chars[maxCol], maxCol);
+		    &BUFFER->row[maxRow].chars[maxCol], BUFFER->row[maxRow].size - maxCol);
 		BUFFER->row[maxRow].size -= maxCol;
 		bufferUpdateRow(&BUFFER->row[maxRow]);
+
+		if (BUFFER->row[maxRow].size == 0)
+			bufferDelRow(maxRow);
 	}
+
+	FRAME->cx = (maxRow > minRow ? 0 : minCol);
 }
 
 void
