@@ -27,7 +27,7 @@ editorScroll (void)
 
 	if (FRAME->cy < BUFFER->numrows)
 	{
-		FRAME->rx = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx);
+		FRAME->rx = bufferRowCxToRx(&BUFFER->row[FRAME->cy], 0, FRAME->cx);
 	}
 
 	FRAME->rowoff = FRAME->cy - FRAME->screenrows < 0 ? 0 : FRAME->cy - FRAME->screenrows + 2;

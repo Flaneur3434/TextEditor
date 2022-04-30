@@ -100,7 +100,7 @@ nextWord (void)
 	{
 		if (iswspace(currentRow->chars[i]) || iswpunct(currentRow->chars[i]))
 		{
-			FRAME->cx = i - 1;
+			FRAME->cx = i;
 			return;
 		}
 	}
@@ -183,12 +183,14 @@ deleteNextWord (void)
 void
 deletePrevWord (void)
 {
-	if (FRAME->cx == 0)
+	if (FRAME->cy != 0 && FRAME->cx == 0)
 	{
 		editorDelChar();
 		return;
 	}
-
-	prevWord();
-	deleteNextWord();
+	else if (FRAME->cx != 0)
+	{
+		prevWord();
+		deleteNextWord();
+	}
 }

@@ -51,7 +51,7 @@ struct textEditorBuffer {
 	state *stateStack;
 };
 
-int bufferRowCxToRx (erow *, int);
+int bufferRowCxToRx (erow *, int, int);
 void bufferUpdateRow (erow *);
 void bufferInsertRow (int, wchar_t *, size_t);
 void bufferFreeRow (erow *);

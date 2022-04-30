@@ -4,10 +4,10 @@ extern editorConfig E;
 extern wchar_t *cwd;   /* current working directory of the program */
 
 int
-bufferRowCxToRx (erow *row, int cx)
+bufferRowCxToRx (erow *row, int beg, int cx)
 {
 	int rx = 0;
-	for (int i = 0; i < cx; i++)
+	for (int i = beg; i < cx; i++)
 	{
 		wchar_t w = row->chars[i];
 		if (w == '\t')
@@ -136,15 +136,23 @@ bufferDelRegion (void)
 	int firstRowColEnd = minRow == maxRow ? maxCol : BUFFER->row[minRow].size;
 	wmemmove(&BUFFER->row[minRow].chars[minCol],
 	    &BUFFER->row[minRow].chars[firstRowColEnd], BUFFER->row[maxRow].size - firstRowColEnd);
-	BUFFER->row[minRow].size -= firstRowColEnd;
-	bufferUpdateRow(&BUFFER->row[minRow]);
+	BUFFER->row[minRow].size -= firstRowColEnd - minCol;
 
 	if (BUFFER->row[minRow].size == 0)
+	{
 		bufferDelRow(minRow);
+	}
+	else
+	{
+		bufferUpdateRow(&BUFFER->row[minRow]);
+	}
 
 	/* Inbetween rows in a multirow region */
-	for (int i = minRow + 1; i < maxRow; i++)
-		bufferDelRow(i);
+	while(minRow < maxRow)
+	{
+		bufferDelRow(minRow);
+		maxRow--;
+	}
 
 	/* Last row in a multirow region */
 	if (minRow != maxRow)
@@ -158,7 +166,8 @@ bufferDelRegion (void)
 			bufferDelRow(maxRow);
 	}
 
-	FRAME->cx = (maxRow > minRow ? 0 : minCol);
+	FRAME->cx = minCol;
+	FRAME->cy = minRow;
 }
 
 void

@@ -87,65 +87,62 @@ editorDelChar (void)
  * Screen min-point / max-point: to know the minimum and maximum coordinates the user can mark without scrolling
  */
 
+
 void
 editorMarkRegion (void)
 {
-	int anchorXFrame = bufferRowCxToRx(&BUFFER->row[FRAME->cy], FRAME->cx)  - FRAME->coloff;
-	int anchorYFrame = FRAME->cy - FRAME->rowoff;
-
-	int anchorX = FRAME->cx;
-	int anchorY = FRAME->cy;
+	int anchorX = FRAME->cx, anchorRX = FRAME->rx, anchorY = FRAME->cy;
 
 	editorSetStatusMessage(L"Marking time");
         editorDrawMessageBar();
 	cursor_set_color_rgb(MARK_CURSOR);
 	/* move back to the text window */
-        wmove(FRAME->frame, anchorYFrame, anchorXFrame);
+        wmove(FRAME->frame, anchorY, anchorRX);
 
+#define MARK_CHAR(y, x) mvwchgat(FRAME->frame, y, x, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL)
         wint_t c;
         while ((wget_wch(FRAME->frame, &c) != ERR) && (c != CTRL_KEY('q')))
 	{
 		editorProcessKeypressMark(c);
 		editorRefreshScreen();
 
-		int currX = 0, currY = 0;
-		getyx(FRAME->frame, currY, currX);
+		int currX = FRAME->rx, currY = FRAME->cy;
 
-		if (currY == anchorYFrame)
+		if (currY == anchorY)
 		{
-			int beg = anchorXFrame < currX ? anchorXFrame: currX;
-			int end = currX > anchorXFrame ? currX : anchorXFrame;
+			int beg = anchorRX < currX ? anchorRX: currX;
+			int end = currX > anchorRX ? currX : anchorRX;
 			for (int i = beg; i <= end; i++)
-				mvwchgat(FRAME->frame, anchorYFrame, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+				MARK_CHAR(currY - FRAME->rowoff, i - FRAME->coloff);
 		}
-		else if (currY > anchorYFrame)
+		else if (currY > anchorY)
 		{
-			for (int i = anchorXFrame; i < BUFFER->row[anchorYFrame].rsize; i++)
-				mvwchgat(FRAME->frame, anchorYFrame, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+			for (int i = anchorRX; i < BUFFER->row[anchorY].rsize; i++)
+				MARK_CHAR(anchorY - FRAME->rowoff, i - FRAME->coloff);
 
-			for (int i = anchorYFrame + 1; i < currY; i++)
+			for (int i = anchorY + 1; i < currY; i++)
 				for (int j = 0; j < BUFFER->row[i].rsize; j++)
-					mvwchgat(FRAME->frame, i, j - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+					MARK_CHAR(i - FRAME->rowoff, j - FRAME->coloff);
 
 			for (int i = 0; i <= currX; i++)
-				mvwchgat(FRAME->frame, currY, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+				MARK_CHAR(currY - FRAME->rowoff, i - FRAME->coloff);
 
 		}
 		else {
-			/* for some reason the cursor position is wrong, only in this block of code */
-			for (int i = anchorXFrame; i >= 0; i--)
-				mvwchgat(FRAME->frame, anchorYFrame, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+			for (int i = anchorRX; i >= 0; i--)
+				MARK_CHAR(anchorY - FRAME->rowoff, i - FRAME->coloff);
 
-			for (int i = currY + 1; i < anchorYFrame; i++)
+			for (int i = currY + 1; i < anchorY; i++)
 				for (int j = 0; j < BUFFER->row[i].rsize; j++)
-					mvwchgat(FRAME->frame, i, j - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+					MARK_CHAR(i - FRAME->rowoff, j - FRAME->coloff);
 
 			for (int i = currX; i <= BUFFER->row[currY].rsize; i++)
-				mvwchgat(FRAME->frame, currY, i - FRAME->coloff, 1, A_REVERSE, TEXTWINDOW_COLOR, NULL);
+				MARK_CHAR(currY - FRAME->rowoff, i - FRAME->coloff);
 		}
 
 		wrefresh(FRAME->frame);
 	}
+#undef MARK_CHAR
 
 	cursor_set_color_rgb(NORMAL_CURSOR);
 	editorSetStatusMessage(L"Marking time done");
